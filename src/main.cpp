@@ -1,0 +1,59 @@
+#include "containerui/webserver.hpp"
+#include "containerui/webserver_context.hpp"
+#include "containerui/webcontent.hpp"
+
+#include <unistd.h>
+
+#include <csignal>
+#include <iostream>
+
+using container_ui::webserver;
+using container_ui::webserver_context;
+
+namespace
+{
+
+bool shutdown_requested = false;
+
+void on_shutdown_requested(int signr)
+{
+    (void) signr;
+    shutdown_requested = true;
+
+}
+
+}
+
+int main(int argc, char * argv[])
+{
+    int exit_code = EXIT_FAILURE;
+
+    signal(SIGPIPE, SIG_IGN);
+    signal(SIGINT, on_shutdown_requested);
+    signal(SIGTERM, on_shutdown_requested);
+
+    try
+    {
+        webserver_context context;
+        context.add_static("/", container_ui::index, "text/html");
+        context.add_passthrough("/api/version", "http://localhost/version");
+        context.add_passthrough("/api/info", "http://localhost/info");
+        context.add_passthrough("/api/system/df", "http://localhost/system/df");
+        context.add_passthrough("/api/containers/json", "http://localhost/containers/json?all=true");
+        context.add_passthrough("/api/images/json", "http://localhost/images/json?all=true");
+        context.add_passthrough("/api/volumes", "http://localhost/volumes");
+        webserver server(8888, std::move(context));
+
+        while (!shutdown_requested) {
+            sleep(3);
+        }
+
+        exit_code = EXIT_SUCCESS;
+    }
+    catch (std::exception const & ex)
+    {
+        std::cout << "error: " << ex.what() << std::endl;        
+    }
+
+    return 0;
+}

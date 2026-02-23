@@ -16,3 +16,4 @@ add_executable(container-ui
     src/main.cpp)
 target_include_directories(container-ui PRIVATE src)
 target_link_libraries(container-ui PRIVATE PkgConfig::MHD CURL::libcurl)
+install(TARGETS container-ui)

@@ -1,5 +1,6 @@
 #include "containerui/webserver.hpp"
 #include <stdexcept>
+#include <iostream>
 
 namespace container_ui
 {
@@ -34,12 +35,18 @@ MHD_Result webserver_handle_request(
         {
             if (handler->can_handle(url))
             {
-                return handler->handle(connection);
+                return handler->handle(connection, url);
             }
         }
     }
+    catch(std::exception const & ex)
+    {
+        std::cerr << "request failed: " << method << " " << url << ": " << ex.what() << std::endl; 
+        return MHD_NO;
+    }
     catch(...)
     {
+        std::cerr << "request failed: " << method << " " << url << std::endl; 
         return MHD_NO;
     }
 

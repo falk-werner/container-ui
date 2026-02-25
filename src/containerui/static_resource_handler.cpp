@@ -19,7 +19,7 @@ bool static_resource_handler::can_handle(std::string const & url)
     return (url == _url);
 }
 
-MHD_Result static_resource_handler::handle(MHD_Connection * connection)
+MHD_Result static_resource_handler::handle(MHD_Connection * connection, std::string const & url)
 {
     auto * response = MHD_create_response_from_buffer(
         _contents.size(),

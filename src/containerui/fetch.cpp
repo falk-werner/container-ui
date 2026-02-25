@@ -35,7 +35,7 @@ size_t on_data(char * ptr, size_t size, size_t n, void * userdata)
 
 }
 
-std::string fetch(
+http_response fetch(
     std::string const & url,
     std::string const & unix_socket)
 {
@@ -58,14 +58,10 @@ std::string fetch(
     }
 
     long status = 0;
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
-    if ((status < 200) || (300 <= status)) {
-        curl_easy_cleanup(curl);
-        throw std::runtime_error("status");
-    }
-    
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);    
     curl_easy_cleanup(curl);
-    return context.buffer.str();
+
+    return { static_cast<int>(status), context.buffer.str() };
 }
 
 

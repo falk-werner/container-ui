@@ -6,7 +6,13 @@
 namespace container_ui
 {
 
-std::string fetch(
+struct http_response
+{
+    int status;
+    std::string contents;
+};
+
+http_response fetch(
     std::string const & url,
     std::string const & unix_socket);
 

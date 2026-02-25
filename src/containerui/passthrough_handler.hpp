@@ -15,7 +15,7 @@ public:
 
     bool can_handle(std::string const & url) override;
 
-    MHD_Result handle(MHD_Connection * connection) override;
+    MHD_Result handle(MHD_Connection * connection, std::string const & url) override;
 
 private:
     std::string const _url;

@@ -20,6 +20,11 @@ struct webserver_context
         std::string const & url,
         std::string const & remote_url);
 
+    void add_passthrough_with_param(
+        std::string const & url_template,
+        std::string const & remote_url_template,
+        std::string const & mimetpye = "application/json");
+
     std::vector<std::unique_ptr<context_handler>> handlers;
 };
 

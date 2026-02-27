@@ -13,13 +13,13 @@ passthrough_handler::passthrough_handler(
 
 }
 
-bool passthrough_handler::can_handle(std::string const & url)
+bool passthrough_handler::handle(
+    request & req,
+    MHD_Result & result)
 {
-    return (url == _url);
-}
+    if (req.url != _url) { return false; }
+    if (req.method != "GET") { return false; }
 
-MHD_Result passthrough_handler::handle(MHD_Connection * connection, std::string const & url)
-{
     auto const resp = fetch(_remote_url, "/var/run/docker.sock");
     auto * response = MHD_create_response_from_buffer(
         resp.contents.size(),
@@ -30,8 +30,9 @@ MHD_Result passthrough_handler::handle(MHD_Connection * connection, std::string 
     }
 
     MHD_add_response_header(response, "Content-Type", "application/json");
-    auto ret = MHD_queue_response(connection, resp.status, response);
-    return ret;
+    result = MHD_queue_response(req.connection, resp.status, response);
+    MHD_destroy_response(response);
+    return true;
 }
 
 

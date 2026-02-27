@@ -1,14 +1,19 @@
 #include "containerui/webserver.hpp"
 #include "containerui/webserver_context.hpp"
 #include "containerui/webcontent.hpp"
+#include "containerui/authorize_handler.hpp"
+#include "containerui/authenticator.hpp"
 
 #include <unistd.h>
 
 #include <csignal>
 #include <iostream>
+#include <memory>
 
 using container_ui::webserver;
 using container_ui::webserver_context;
+using container_ui::authorize_handler;
+using container_ui::authenticator;
 
 namespace
 {
@@ -34,8 +39,11 @@ int main(int argc, char * argv[])
 
     try
     {
+        authenticator auth;
+
         webserver_context context;
         context.add_static("/", container_ui::index, "text/html");
+        context.add(std::make_unique<authorize_handler>("/auth/authorize", auth));
 
         context.add_passthrough("/api/version", "http://localhost/version");
         context.add_passthrough("/api/info", "http://localhost/info");
@@ -47,9 +55,13 @@ int main(int argc, char * argv[])
             "text/plain");
         context.add_passthrough_with_param("/api/containers/{name}/json", "http://localhost/containers/{name}/json");
         context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top?ps_args=-eTopid,ppid,spid,pcpu,pmem,vsz,cmd");
+        context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats?oneshot=true&stream=false");
 
         context.add_passthrough("/api/images/json", "http://localhost/images/json?all=true");
+        context.add_passthrough_with_param("/api/images/{name}/json", "http://localhost/images/{name}/json");
+
         context.add_passthrough("/api/volumes", "http://localhost/volumes");
+        context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}");
 
         webserver server(8888, std::move(context));
 

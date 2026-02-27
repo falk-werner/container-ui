@@ -1,12 +1,12 @@
 #ifndef CONTAINERUI_STATIC_RESOURCE_HANDLER_HPP
 #define CONTAINERUI_STATIC_RESOURCE_HANDLER_HPP
 
-#include "containerui/context_handler.hpp"
+#include "containerui/request_handler.hpp"
 
 namespace container_ui
 {
 
-class static_resource_handler: public context_handler
+class static_resource_handler: public request_handler
 {
 public:
     static_resource_handler(
@@ -16,9 +16,9 @@ public:
     
     ~static_resource_handler() override = default;
 
-    bool can_handle(std::string const & url) override;
-
-    MHD_Result handle(MHD_Connection * connection, std::string const & url) override;
+    bool handle(
+        request & req,
+        MHD_Result & result) override;
 
 private:
     std::string const _url;

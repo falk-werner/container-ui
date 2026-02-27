@@ -18,26 +18,33 @@ MHD_Result webserver_handle_request(
     size_t * upload_data_size,
     void * * connection_cls)
 {
-    if (method != std::string("GET"))
-    {
-        return MHD_NO;
-    }
-
     auto * context = reinterpret_cast<webserver_context*>(cls);
     if (context == nullptr)
     {
         return MHD_NO;
     }
 
+    request req {
+        connection, url, method,
+        upload_data, upload_data_size,
+        connection_cls
+    };
+
     try
     {
         for(auto const &handler: context->handlers)
         {
-            if (handler->can_handle(url))
+            MHD_Result result = MHD_NO;
+            if (handler->handle(req, result))
             {
-                return handler->handle(connection, url);
+                return result;
             }
         }
+
+        auto * response = MHD_create_response_empty(MHD_RF_NONE);
+        auto result = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
+        MHD_destroy_response(response);
+        return result;
     }
     catch(std::exception const & ex)
     {
@@ -49,8 +56,6 @@ MHD_Result webserver_handle_request(
         std::cerr << "request failed: " << method << " " << url << std::endl; 
         return MHD_NO;
     }
-
-    return MHD_NO;
 }
 
 }

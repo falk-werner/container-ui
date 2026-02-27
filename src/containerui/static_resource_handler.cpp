@@ -14,24 +14,26 @@ static_resource_handler::static_resource_handler(
 
 }
 
-bool static_resource_handler::can_handle(std::string const & url)
+bool static_resource_handler::handle(
+    request & req,
+    MHD_Result & result)
 {
-    return (url == _url);
-}
+    if (req.url != _url) { return false; }
+    if (req.method != "GET") { return false; }
 
-MHD_Result static_resource_handler::handle(MHD_Connection * connection, std::string const & url)
-{
     auto * response = MHD_create_response_from_buffer(
         _contents.size(),
         const_cast<void*>(reinterpret_cast<void const*>(_contents.c_str())),
         MHD_RESPMEM_PERSISTENT);
     if (response == nullptr) {
-        return MHD_NO;
+        result = MHD_NO;
+        return true;
     }
     MHD_add_response_header(response, "Content-Type", _mimetype.c_str());
 
-    auto ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-    return ret;
+    result = MHD_queue_response(req.connection, MHD_HTTP_OK, response);
+    MHD_destroy_response(response);
+    return true;
 }
 
 

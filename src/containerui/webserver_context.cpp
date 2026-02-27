@@ -6,6 +6,11 @@
 namespace container_ui
 {
 
+void webserver_context::add(std::unique_ptr<request_handler> handler)
+{
+    handlers.emplace_back(std::move(handler));
+}
+
 void webserver_context::add_static(
     std::string const & url,
     std::string const & contents,

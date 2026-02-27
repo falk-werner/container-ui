@@ -66,17 +66,15 @@ passthrough_with_param_handler::passthrough_with_param_handler(
 }
 
 
-bool passthrough_with_param_handler::can_handle(std::string const & url)
-{
-    return (!check_url(url, url_prefix, url_suffix).empty());
-}
 
-MHD_Result passthrough_with_param_handler::handle(MHD_Connection * connection, std::string const & url)
+bool passthrough_with_param_handler::handle(
+    request & req,
+    MHD_Result & result)
 {
-    std::string const param = check_url(url, url_prefix, url_suffix);
-    if (param.empty()) {
-        return MHD_NO;
-    }
+    std::string const param = check_url(req.url, url_prefix, url_suffix);
+
+    if (param.empty()) { return false; }
+    if (req.method != "GET") { return false; }
 
     std::string const remote_url = remote_url_prefix + param + remote_url_suffix;
 
@@ -90,8 +88,9 @@ MHD_Result passthrough_with_param_handler::handle(MHD_Connection * connection, s
     }
 
     MHD_add_response_header(response, "Content-Type", _mimetype.c_str());
-    auto ret = MHD_queue_response(connection, resp.status, response);
-    return ret;
+    result = MHD_queue_response(req.connection, resp.status, response);
+    MHD_destroy_response(response);
+    return true;
 }
 
 }

@@ -1,7 +1,7 @@
 #ifndef CONTAINERUI_WEBSERVER_CONTEXT_HPP
 #define CONTAINERUI_WEBSERVER_CONTEXT_HPP
 
-#include "containerui/context_handler.hpp"
+#include "containerui/request_handler.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -11,6 +11,8 @@ namespace container_ui
 
 struct webserver_context
 {
+    void add(std::unique_ptr<request_handler> handler);
+
     void add_static(
         std::string const & url,
         std::string const & contents,
@@ -25,7 +27,7 @@ struct webserver_context
         std::string const & remote_url_template,
         std::string const & mimetpye = "application/json");
 
-    std::vector<std::unique_ptr<context_handler>> handlers;
+    std::vector<std::unique_ptr<request_handler>> handlers;
 };
 
 }

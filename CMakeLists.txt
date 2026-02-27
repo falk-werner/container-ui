@@ -14,16 +14,16 @@ add_library(container-ui-static STATIC
     src/containerui/static_resource_handler.cpp
     src/containerui/passthrough_handler.cpp
     src/containerui/passthrough_with_param_handler.cpp
-    src/containerui/authorize_handler.cpp
-    src/containerui/authenticator.cpp
     src/containerui/webserver.cpp
     src/containerui/webserver_context.cpp
-    src/containerui/fetch.cpp
-    src/containerui/url_util.cpp
-    src/containerui/post_data.cpp
-    src/containerui/timestamp.cpp
-    src/containerui/b64.cpp
-    src/containerui/token.cpp
+    src/containerui/util/fetch.cpp
+    src/containerui/util/url_util.cpp
+    src/containerui/util/post_data.cpp
+    src/containerui/util/timestamp.cpp
+    src/containerui/util/b64.cpp
+    src/containerui/util/token.cpp
+    src/containerui/auth/authorize_handler.cpp
+    src/containerui/auth/authenticator.cpp
 )
 target_include_directories(container-ui-static PUBLIC src)
 target_link_libraries(container-ui-static PUBLIC PkgConfig::MHD CURL::libcurl OpenSSL::Crypto)

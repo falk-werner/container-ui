@@ -1,5 +1,5 @@
-#include "containerui/token.hpp"
-#include "containerui/b64.hpp"
+#include "containerui/util/token.hpp"
+#include "containerui/util/b64.hpp"
 
 #include <openssl/rand.h>
 

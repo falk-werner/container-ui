@@ -1,4 +1,4 @@
-#include "containerui/url_util.hpp"
+#include "containerui/util/url_util.hpp"
 #include <gtest/gtest.h>
 
 TEST(url_util, escape_nop)

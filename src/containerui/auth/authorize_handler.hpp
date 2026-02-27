@@ -2,7 +2,7 @@
 #define CONTAINERUI_AUTHORIZE_HANDLER_HPP
 
 #include "containerui/request_handler.hpp"
-#include "containerui/authenticator.hpp"
+#include "containerui/auth/authenticator.hpp"
 
 namespace container_ui
 {

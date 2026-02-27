@@ -4,11 +4,12 @@ RUN apk add --no-cache \
     build-base \
     cmake \
     curl-dev \
+    openssl-dev \
     libmicrohttpd-dev
 
 COPY . /src
 WORKDIR /src
-RUN cmake -B build -D CMAKE_BUILD_TYPE=MinSizeRel
+RUN cmake -B build -D CMAKE_BUILD_TYPE=MinSizeRel -D WITHOUT_TEST=ON
 RUN cmake --build build
 RUN cmake --install build
 
@@ -17,6 +18,7 @@ FROM alpine AS image
 RUN apk add --no-cache \
     libstdc++ \
     curl \
+    openssl \
     libmicrohttpd
 COPY --from=builder /usr/local/bin/container-ui /usr/local/bin/container-ui
 

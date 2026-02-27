@@ -1,6 +1,6 @@
-#include "containerui/authenticator.hpp"
-#include "containerui/timestamp.hpp"
-#include "containerui/token.hpp"
+#include "containerui/auth/authenticator.hpp"
+#include "containerui/util/timestamp.hpp"
+#include "containerui/util/token.hpp"
 
 #include <iostream>
 #include <algorithm>

@@ -1,8 +1,8 @@
 #include "containerui/webserver.hpp"
 #include "containerui/webserver_context.hpp"
 #include "containerui/webcontent.hpp"
-#include "containerui/authorize_handler.hpp"
-#include "containerui/authenticator.hpp"
+#include "containerui/auth/authorize_handler.hpp"
+#include "containerui/auth/authenticator.hpp"
 
 #include <unistd.h>
 

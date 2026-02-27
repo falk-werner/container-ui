@@ -6,6 +6,7 @@ option(WITHOUT_TEST "Disable unit test" OFF)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(MHD REQUIRED libmicrohttpd IMPORTED_TARGET)
 
@@ -21,9 +22,11 @@ add_library(container-ui-static STATIC
     src/containerui/url_util.cpp
     src/containerui/post_data.cpp
     src/containerui/timestamp.cpp
+    src/containerui/b64.cpp
+    src/containerui/token.cpp
 )
 target_include_directories(container-ui-static PUBLIC src)
-target_link_libraries(container-ui-static PUBLIC PkgConfig::MHD CURL::libcurl)
+target_link_libraries(container-ui-static PUBLIC PkgConfig::MHD CURL::libcurl OpenSSL::Crypto)
 
 
 add_executable(container-ui src/main.cpp)
@@ -42,6 +45,7 @@ include(GoogleTest)
 add_executable(alltests
     test-src/test_url_util.cpp
     test-src/test_post_data.cpp
+    test-src/test_b64.cpp
 )
 
 target_link_libraries(alltests PRIVATE container-ui-static GTest::gtest GTest::gtest_main)

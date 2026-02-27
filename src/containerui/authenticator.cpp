@@ -1,5 +1,6 @@
 #include "containerui/authenticator.hpp"
 #include "containerui/timestamp.hpp"
+#include "containerui/token.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -8,7 +9,7 @@ namespace container_ui
 {
 
 authenticator::authenticator()
-: initial_password("secret")
+: initial_password(generate_token())
 {
     std::cout << "initial admin password: " << initial_password << std::endl;
 }
@@ -22,7 +23,11 @@ std::string authenticator::authenticate(
 
     if ((username == "admin") && (password == initial_password))
     {
-        std::string const code = "code";
+        std::string code = generate_token();
+        while (codes.contains(code)) {
+            code = generate_token();
+        }
+
         code_context context;
         context.expire_at = get_timestamp() + 60;
         context.challenge = challenge;
@@ -44,7 +49,11 @@ std::string authenticator::get_token(
     if (entry != codes.end()) {
         codes.erase(entry);
 
-        std::string const token = "token";
+        std::string token = generate_token();
+        while (tokens.contains(token)) {
+            token = generate_token();
+        }
+
         token_context context;
         context.expire_at = get_timestamp() + (2 * 60 * 60);
         return token;

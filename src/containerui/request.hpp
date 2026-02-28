@@ -20,6 +20,7 @@ struct request
     MHD_Result respond_empty(unsigned int status_code);    
     MHD_Result respond(unsigned int status_code, std::string const & contents, std::string const & content_type);
     MHD_Result respond_static(unsigned int status_code, std::string const & contents, std::string const & content_type);
+    MHD_Result response_redirect(std::string const & location);
 
 };
 

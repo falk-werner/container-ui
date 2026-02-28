@@ -2,6 +2,7 @@
 #include "containerui/webserver_context.hpp"
 #include "containerui/webcontent.hpp"
 #include "containerui/auth/authorize_handler.hpp"
+#include "containerui/auth/token_handler.hpp"
 #include "containerui/auth/authenticator.hpp"
 
 #include <unistd.h>
@@ -13,6 +14,7 @@
 using container_ui::webserver;
 using container_ui::webserver_context;
 using container_ui::authorize_handler;
+using container_ui::token_handler;
 using container_ui::authenticator;
 
 namespace
@@ -44,6 +46,7 @@ int main(int argc, char * argv[])
         webserver_context context;
         context.add_static("/", std::string(reinterpret_cast<char*>(index_html), index_html_len), "text/html");
         context.add(std::make_unique<authorize_handler>("/auth/authorize", auth));
+        context.add(std::make_unique<token_handler>("/auth/token", auth));
 
         context.add_passthrough("/api/version", "http://localhost/version");
         context.add_passthrough("/api/info", "http://localhost/info");

@@ -59,5 +59,20 @@ MHD_Result request::respond_static(unsigned int status_code, std::string const &
     return respond_generic(connection, status_code, contents, content_type, MHD_RESPMEM_PERSISTENT);
 }
 
+MHD_Result request::response_redirect(std::string const & location)
+{
+    auto * const response = MHD_create_response_empty(MHD_RF_NONE);
+    if (nullptr == response) {
+        return MHD_NO;
+    }
+
+    MHD_add_response_header(response, "Location", location.c_str());
+
+    auto const result = MHD_queue_response(connection, MHD_HTTP_SEE_OTHER, response);
+    MHD_destroy_response(response);
+    return result;
+
+}
+
 
 }

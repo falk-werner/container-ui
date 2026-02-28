@@ -34,6 +34,7 @@ add_library(container-ui-static STATIC
     src/containerui/util/b64.cpp
     src/containerui/util/token.cpp
     src/containerui/auth/authorize_handler.cpp
+    src/containerui/auth/token_handler.cpp
     src/containerui/auth/authenticator.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/index_html.c
 )

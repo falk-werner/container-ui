@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 namespace container_ui
 {
@@ -18,13 +19,13 @@ constexpr char const auth_html_template[] = R"(<!DOCTYPE html>
 </head>
 <body>
     <form method="post">
-        <input type="hidden" name="challenge" value="${RESPONSE_TYPE}" />
-        <input type="hidden" name="challenge" value="${CLIENT_ID}" />
-        <input type="hidden" name="challenge" value="${REDIRECT_URI}" />
-        <input type="hidden" name="challenge" value="${SCOPE}" />
-        <input type="hidden" name="challenge" value="${STATE}" />
-        <input type="hidden" name="challenge" value="${CODE_CHALLENGE_METHOD}" />
-        <input type="hidden" name="challenge" value="${CODE_CHALLENGE}" />
+        <input type="hidden" name="response_type" value="${RESPONSE_TYPE}" />
+        <input type="hidden" name="client_id" value="${CLIENT_ID}" />
+        <input type="hidden" name="redirect_uri" value="${REDIRECT_URI}" />
+        <input type="hidden" name="scope" value="${SCOPE}" />
+        <input type="hidden" name="state" value="${STATE}" />
+        <input type="hidden" name="code_challenge_method" value="${CODE_CHALLENGE_METHOD}" />
+        <input type="hidden" name="code_challenge" value="${CODE_CHALLENGE}" />
         <label for="username">Username: </label>
         <input name="username" type="text" />
         <label for="password">Username: </label>
@@ -34,13 +35,6 @@ constexpr char const auth_html_template[] = R"(<!DOCTYPE html>
 </body>
 </html>
 )";
-
-struct post_context
-{
-    size_t limit;
-    size_t count;
-    std::stringstream contents;
-};
 
 void replace(std::string & value, std::string const & what, std::string const & to)
 {
@@ -99,9 +93,9 @@ MHD_Result handle_get(request & req)
     std::string auth_html(auth_html_template);
     replace(auth_html, "${RESPONSE_TYPE}", response_type);
     replace(auth_html, "${CLIENT_ID}", client_id);
-    replace(auth_html, "${REDIRECT_URL}", redirect_uri);
+    replace(auth_html, "${REDIRECT_URI}", redirect_uri);
     replace(auth_html, "${SCOPE}", scope);
-    replace(auth_html, "${SCOPE}", state);
+    replace(auth_html, "${STATE}", state);
     replace(auth_html, "${CODE_CHALLENGE_METHOD}", code_challenge_method);
     replace(auth_html, "${CODE_CHALLENGE}", code_challenge);
 
@@ -110,81 +104,48 @@ MHD_Result handle_get(request & req)
 
 MHD_Result handle_post(request & req, authenticator & auth)
 {
-    if ((*req.connection_cls) == nullptr)
-    {
-        post_context * const context = new post_context;
-        context->count = 0;
-        context->limit = 100 * 1024;
-        *req.connection_cls = reinterpret_cast<void*>(context);
-
-        return MHD_YES;
+    MHD_Result result = MHD_NO;
+    std::unordered_map<std::string, std::string> data;
+    if (!update_post_data(req, result, data)) {
+        return result;
     }
 
-    post_context * const context = reinterpret_cast<post_context*>(*req.connection_cls);
-    auto const size = *req.upload_data_size;
+    std::vector<std::string> required_keys = {
+        "response_type",
+        "client_id",
+        "redirect_uri",
+        "scope",
+        "state",
+        "code_challenge_method",
+        "code_challenge",
+        "username",
+        "password"
+    };
 
-    if (size > 0) {
-        size_t const new_count = context->count + size;
-        if (new_count > context->limit) {
-            delete context;
-            *req.connection_cls = nullptr;
-            return MHD_NO;
+    for(auto const & key: required_keys) {
+        if (!data.contains(key)) {
+            std::cerr << "error: missing " << key << std::endl;
+            return req.respond_empty(MHD_HTTP_BAD_REQUEST);
         }
-
-        context->contents.write(req.upload_data, size);
-        context->count = new_count;
-        *req.upload_data_size = 0;
-        return MHD_YES;
     }
 
-    auto data = parse_post_data(context->contents.str());
-    
-    delete context;
-    *req.connection_cls = nullptr;
 
-    auto * const response = MHD_create_response_empty(MHD_RF_NONE);
-    if (response == nullptr) {
-        return MHD_NO;
+    std::string const url = auth.authenticate(
+        data.at("response_type"),
+        data.at("client_id"),
+        data.at("redirect_uri"),
+        data.at("scope"),
+        data.at("state"),
+        data.at("code_challenge_method"),
+        data.at("code_challenge"),
+        data.at("username"),
+        data.at("password"));
+
+    if (url.empty()) {
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
     }
 
-    bool success = true;
-
-    auto username = data.find("username");
-    if (username == data.end()) {
-        std::cerr << "error: missing username" << std::endl;
-        success = false;
-    }
-
-    auto password = data.find("password");
-    if (password == data.end()) {
-        std::cerr << "error: missing password" << std::endl;
-        success = false;
-    }
-
-    auto challenge = data.find("challenge");
-    if (challenge == data.end()) {
-        std::cerr << "error: missing challenge" << std::endl;
-        success = false;
-    }
-
-    std::string const code = auth.authenticate(username->second, password->second, challenge->second);
-    if (code.empty()) {
-        std::cerr << "error: invalid credentials" << std::endl;
-        success = false;
-    }
-
-    if (success) {
-        auto const url = std::string("/?code=") + code;
-        MHD_add_response_header(response, "Location", url.c_str());
-    }
-    else {
-        MHD_add_response_header(response, "Location", "/?error=authentication%20failed");
-    }
-
-    auto const result = MHD_queue_response(req.connection, MHD_HTTP_SEE_OTHER, response);
-    MHD_destroy_response(response);
-
-    return result;
+    return req.response_redirect(url);
 }
 
 }

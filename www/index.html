@@ -5,6 +5,8 @@
     <style type="text/css">
         html, body {
             font-family: Courier New, Monospace;
+            height: 100vh;
+            margin: 0;
         }
 
         tr {
@@ -26,6 +28,40 @@
         table {
             border-collapse: collapse;
         }
+
+        .hidden {
+            display: none!important;
+            visibility: hidden;
+        }
+
+        .dialog {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .dialog > div {
+            padding: 50px;
+        }
+
+        #splash > div {
+            text-align: center;
+            animation: 5s splash_ani linear infinite;
+
+        }
+
+        @keyframes splash_ani {
+            0%, 100% {
+                color: white;
+            }
+
+            50% {
+                color: #709B9E;
+            }
+        }
+
     </style>
     <script type="text/javascript">
 
@@ -213,14 +249,59 @@
         const query_args = new URLSearchParams(window.location.search);
         if (query_args.size == 0) {
             login();
+            return;
         }
-        else {
+
+
+        let login_successful = false;
+        try {
+            const code = query_args.get("code");
+            const code_verifier = localStorage.getItem("code_verifier");
+            //localStorage.removeItem("code_verifier");
+
+            if ((code) && (code_verifier)) {
+                const body = "grant_type=authorization_code&" +
+                    `code=${code}&` +
+                    "client_id=container_ui&" +
+                    `code_verifier=${code_verifier}&` +
+                    "redirect_uri=/";
+
+                const resp = await fetch("/auth/token", {
+                    "method": "POST",
+                    "headers": {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    "body": body
+                });
+
+                const data = await resp.json();
+                console.log(data);
+
+
+                login_successful = true;
+            }
+        }
+        catch (ex) {
+            // swallow
+        }
+
+        const splash = document.querySelector("#splash");
+        splash.classList.add("hidden");
+
+        if (login_successful) {
+            const main = document.querySelector("#main");
+            main.classList.remove("hidden");
+
             engine_info();
             system_info();
             disk_usage();
             containers();
             images();
             volumes();
+        }
+        else {
+            const login_failed = document.querySelector("#login_failed");
+            login_failed.classList.remove("hidden");
         }
 
     }
@@ -229,69 +310,86 @@
     </script>
 </head>
 <body onload="startup();">
-    <h1>Container UI</h1>
-    
-    <h2>System</h2>
-    <table>
-        <tr><th>Operating System</th><td id="system_os"></td></tr>
-        <tr><th>Architecture</th><td id="system_arch"></td></tr>
-        <tr><th>CPUs</th><td id="system_ncpu"></td></tr>
-        <tr><th>Memory</th><td id="system_memory"></td></tr>
-    </table>
+
+    <div id="splash" class="dialog">
+        <div>Loading Container UI...</div>
+    </div>
+
+    <div id="login_failed" class="dialog hidden">
+        <div>
+            <h1>Login Failed</h1>
+            <a href="/">Reload</a>
+        </div>
+    </div>
+
+    <div id="main" class="hidden">
+
+        <h1>Container UI</h1>
+        
+        <h2>System</h2>
+        <table>
+            <tr><th>Operating System</th><td id="system_os"></td></tr>
+            <tr><th>Architecture</th><td id="system_arch"></td></tr>
+            <tr><th>CPUs</th><td id="system_ncpu"></td></tr>
+            <tr><th>Memory</th><td id="system_memory"></td></tr>
+        </table>
 
 
-    <h2>Engine</h2>
-    <table>
-        <tr><th>Name</th><td id="engine_name"></td></tr>
-        <tr><th>Version</th><td id="engine_version"></td></tr>
-    </table>  
+        <h2>Engine</h2>
+        <table>
+            <tr><th>Name</th><td id="engine_name"></td></tr>
+            <tr><th>Version</th><td id="engine_version"></td></tr>
+        </table>  
 
-    <h2>Disk Usage</h2>
-    <table>
-        <tr><th>Category</th><th>Count</th><th>Total Size</th><th>Reclaimable Size</th></tr>
-        <tr><th>Containers</th><td id="df_container_count"></td><td id="df_container_total"></td><td id="df_container_reclaimable"></td></tr>
-        <tr><th>Images</th><td id="df_image_count"></td><td id="df_image_total"></td><td id="df_image_reclaimable"></td></tr>
-        <tr><th>Volumes</th><td id="df_volume_count"></td><td id="df_volume_total"></td><td id="df_volume_reclaimable"></td></tr>
-        <tr><th>Build Cache</th><td id="df_bcache_count"></td><td id="df_bcache_total"></td><td id="df_bcache_reclaimable"></td></tr>
-    </table>
+        <h2>Disk Usage</h2>
+        <table>
+            <tr><th>Category</th><th>Count</th><th>Total Size</th><th>Reclaimable Size</th></tr>
+            <tr><th>Containers</th><td id="df_container_count"></td><td id="df_container_total"></td><td id="df_container_reclaimable"></td></tr>
+            <tr><th>Images</th><td id="df_image_count"></td><td id="df_image_total"></td><td id="df_image_reclaimable"></td></tr>
+            <tr><th>Volumes</th><td id="df_volume_count"></td><td id="df_volume_total"></td><td id="df_volume_reclaimable"></td></tr>
+            <tr><th>Build Cache</th><td id="df_bcache_count"></td><td id="df_bcache_total"></td><td id="df_bcache_reclaimable"></td></tr>
+        </table>
 
-    <h2>Containers</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Names</th>
-                <th>Image</th>
-                <th>Status</th>
-                <th>Ports</th>
-            </tr>
-        </thead>
-        <tbody id="containers"></tbody>
-    </table>
+        <h2>Containers</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Names</th>
+                    <th>Image</th>
+                    <th>Status</th>
+                    <th>Ports</th>
+                </tr>
+            </thead>
+            <tbody id="containers"></tbody>
+        </table>
 
-    <h2>Images</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Tags</th>
-                <th>Created</th>
-                <th>Size</th>
-            </tr>
-        </thead>
-        <tbody id="images"></tbody>
-    </table>
+        <h2>Images</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tags</th>
+                    <th>Created</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody id="images"></tbody>
+        </table>
 
-    <h2>Volumes</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Created</th>
-            </tr>
-        </thead>
-        <tbody id="volumes"></tbody>
-    </table>
+        <h2>Volumes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody id="volumes"></tbody>
+        </table>
+
+    </div>
+
 
 </body>
 </html>

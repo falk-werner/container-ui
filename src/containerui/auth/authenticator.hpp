@@ -19,20 +19,30 @@ struct token_context
     uint64_t expire_at;
 };
 
+
 class authenticator
 {
 public:
     authenticator();
     ~authenticator() = default;
 
-    std::string authenticate(
+   std::string authenticate(
+        std::string const& response_type,
+        std::string const& client_id,
+        std::string const& redirect_uri,
+        std::string const& scope,
+        std::string const& state,
+        std::string const& code_challenge_method,
+        std::string const& code_challenge,
         std::string const& username,
-        std::string const& password,
-        std::string const& challenge);
+        std::string const& password);
 
     std::string get_token(
+        std::string const& grant_type,
         std::string const& code,
-        std::string const& code_verifier);
+        std::string const& code_verifier,
+        std::string const& client_id,
+        std::string const& redirect_uri);
 
     bool is_token_valid(
         std::string const& token);

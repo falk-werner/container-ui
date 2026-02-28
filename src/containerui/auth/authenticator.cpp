@@ -28,8 +28,13 @@ std::string authenticator::authenticate(
 {
     check_codes_and_tokens();
 
+    if (codes.size() > 100) {
+        std::cerr << "max number of codes exceeded";
+        return "";
+    }
+
     if (redirect_uri != "/") {
-        std::cerr << "invalid redirect_uri: " << redirect_uri;
+        std::cerr << "invalid redirect_uri";
         return "";
     }
 
@@ -75,6 +80,10 @@ std::string authenticator::get_token(
     std::string const& redirect_uri)
 {
     check_codes_and_tokens();
+
+    if (tokens.size() > 100) {
+        return "{\"error\":\"too many active tokens - try again later\"}";
+    }
 
     if (grant_type != "authorization_code") {
         return "{\"error\":\"invalid grant_type\"}";

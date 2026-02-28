@@ -13,11 +13,26 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(MHD REQUIRED libmicrohttpd IMPORTED_TARGET)
 
 add_custom_command(
-    OUTPUT  index_html.c
+    OUTPUT  index_html.c style_css.c script_main_js.c script_api_js.c script_login_js.c script_util.js
     COMMAND xxd -n index_html -i
               ${CMAKE_CURRENT_SOURCE_DIR}/www/index.html
               ${CMAKE_CURRENT_BINARY_DIR}/index_html.c
-    DEPENDS www/index.html
+    COMMAND xxd -n style_css -i
+              ${CMAKE_CURRENT_SOURCE_DIR}/www/style.css
+              ${CMAKE_CURRENT_BINARY_DIR}/style_css.c
+    COMMAND xxd -n script_main_js -i
+              ${CMAKE_CURRENT_SOURCE_DIR}/www/script/main.js
+              ${CMAKE_CURRENT_BINARY_DIR}/script_main_js.c
+    COMMAND xxd -n script_api_js -i
+              ${CMAKE_CURRENT_SOURCE_DIR}/www/script/api.js
+              ${CMAKE_CURRENT_BINARY_DIR}/script_api_js.c
+    COMMAND xxd -n script_login_js -i
+              ${CMAKE_CURRENT_SOURCE_DIR}/www/script/login.js
+              ${CMAKE_CURRENT_BINARY_DIR}/script_login_js.c
+    COMMAND xxd -n script_util_js -i
+              ${CMAKE_CURRENT_SOURCE_DIR}/www/script/util.js
+              ${CMAKE_CURRENT_BINARY_DIR}/script_util_js.c
+    DEPENDS www/index.html www/style.css www/script/main.js www/script/api.js www/script/login.js www/script/util.js
 )
 
 add_library(container-ui-static STATIC
@@ -37,6 +52,11 @@ add_library(container-ui-static STATIC
     src/containerui/auth/token_handler.cpp
     src/containerui/auth/authenticator.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/index_html.c
+    ${CMAKE_CURRENT_BINARY_DIR}/style_css.c
+    ${CMAKE_CURRENT_BINARY_DIR}/script_main_js.c
+    ${CMAKE_CURRENT_BINARY_DIR}/script_api_js.c
+    ${CMAKE_CURRENT_BINARY_DIR}/script_login_js.c
+    ${CMAKE_CURRENT_BINARY_DIR}/script_util_js.c
 )
 target_include_directories(container-ui-static PUBLIC src)
 target_link_libraries(container-ui-static PUBLIC PkgConfig::MHD CURL::libcurl OpenSSL::Crypto)

@@ -1,0 +1,58 @@
+html, body {
+    font-family: Courier New, Monospace;
+    height: 100vh;
+    margin: 0;
+}
+
+tr {
+    text-align: left;
+}
+
+td {
+    text-align: right;
+}
+
+table, tr, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 5px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+.hidden {
+    display: none!important;
+    visibility: hidden;
+}
+
+.dialog {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.dialog > div {
+    padding: 50px;
+}
+
+#splash > div {
+    text-align: center;
+    animation: 5s splash_ani linear infinite;
+
+}
+
+@keyframes splash_ani {
+    0%, 100% {
+        color: white;
+    }
+
+    50% {
+        color: #709B9E;
+    }
+}

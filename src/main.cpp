@@ -45,6 +45,13 @@ int main(int argc, char * argv[])
 
         webserver_context context;
         context.add_static("/", std::string(reinterpret_cast<char*>(index_html), index_html_len), "text/html");
+        context.add_static("/style.css", std::string(reinterpret_cast<char*>(style_css), style_css_len), "text/css");
+        context.add_static("/script/main.js", std::string(reinterpret_cast<char*>(script_main_js), script_main_js_len), "text/javascript");
+        context.add_static("/script/api.js", std::string(reinterpret_cast<char*>(script_api_js), script_api_js_len), "text/javascript");
+        context.add_static("/script/login.js", std::string(reinterpret_cast<char*>(script_login_js), script_login_js_len), "text/javascript");
+        context.add_static("/script/util.js", std::string(reinterpret_cast<char*>(script_util_js), script_util_js_len), "text/javascript");
+
+
         context.add(std::make_unique<authorize_handler>("/auth/authorize", auth));
         context.add(std::make_unique<token_handler>("/auth/token", auth));
 

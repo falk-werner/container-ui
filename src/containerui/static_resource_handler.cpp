@@ -19,20 +19,12 @@ bool static_resource_handler::handle(
     MHD_Result & result)
 {
     if (req.url != _url) { return false; }
-    if (req.method != "GET") { return false; }
-
-    auto * response = MHD_create_response_from_buffer(
-        _contents.size(),
-        const_cast<void*>(reinterpret_cast<void const*>(_contents.c_str())),
-        MHD_RESPMEM_PERSISTENT);
-    if (response == nullptr) {
-        result = MHD_NO;
+    if (req.method != "GET") {
+        result = req.respond_empty(MHD_HTTP_METHOD_NOT_ALLOWED);
         return true;
     }
-    MHD_add_response_header(response, "Content-Type", _mimetype.c_str());
 
-    result = MHD_queue_response(req.connection, MHD_HTTP_OK, response);
-    MHD_destroy_response(response);
+    result = req.respond_static(MHD_HTTP_OK, _contents, _mimetype);
     return true;
 }
 

@@ -74,22 +74,15 @@ bool passthrough_with_param_handler::handle(
     std::string const param = check_url(req.url, url_prefix, url_suffix);
 
     if (param.empty()) { return false; }
-    if (req.method != "GET") { return false; }
+    if (req.method != "GET") {
+        result = req.respond_empty(MHD_HTTP_METHOD_NOT_ALLOWED);
+        return true;
+    }
 
     std::string const remote_url = remote_url_prefix + param + remote_url_suffix;
 
     auto const resp = fetch(remote_url, "/var/run/docker.sock");
-    auto * response = MHD_create_response_from_buffer(
-        resp.contents.size(),
-        const_cast<void*>(reinterpret_cast<void const*>(resp.contents.c_str())),
-        MHD_RESPMEM_MUST_COPY);
-    if (response == nullptr) {
-        return MHD_NO;
-    }
-
-    MHD_add_response_header(response, "Content-Type", _mimetype.c_str());
-    result = MHD_queue_response(req.connection, resp.status, response);
-    MHD_destroy_response(response);
+    result = req.respond(resp.status, resp.contents, _mimetype);
     return true;
 }
 

@@ -5,10 +5,20 @@ option(WITHOUT_TEST "Disable unit test" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_program(XXD xxd REQUIRED)
+
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(MHD REQUIRED libmicrohttpd IMPORTED_TARGET)
+
+add_custom_command(
+    OUTPUT  index_html.c
+    COMMAND xxd -n index_html -i
+              ${CMAKE_CURRENT_SOURCE_DIR}/www/index.html
+              ${CMAKE_CURRENT_BINARY_DIR}/index_html.c
+    DEPENDS www/index.html
+)
 
 add_library(container-ui-static STATIC
     src/containerui/static_resource_handler.cpp
@@ -25,6 +35,7 @@ add_library(container-ui-static STATIC
     src/containerui/util/token.cpp
     src/containerui/auth/authorize_handler.cpp
     src/containerui/auth/authenticator.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/index_html.c
 )
 target_include_directories(container-ui-static PUBLIC src)
 target_link_libraries(container-ui-static PUBLIC PkgConfig::MHD CURL::libcurl OpenSSL::Crypto)

@@ -3,6 +3,7 @@ FROM alpine AS builder
 RUN apk add --no-cache \
     build-base \
     cmake \
+    xxd \
     curl-dev \
     openssl-dev \
     libmicrohttpd-dev

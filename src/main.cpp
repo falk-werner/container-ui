@@ -42,7 +42,7 @@ int main(int argc, char * argv[])
         authenticator auth;
 
         webserver_context context;
-        context.add_static("/", container_ui::index, "text/html");
+        context.add_static("/", reinterpret_cast<char*>(index_html), "text/html");
         context.add(std::make_unique<authorize_handler>("/auth/authorize", auth));
 
         context.add_passthrough("/api/version", "http://localhost/version");

@@ -103,6 +103,7 @@ std::string authenticator::get_token(
     }
     token_context context;
     context.expire_at = get_timestamp() + (2 * 60 * 60);
+    tokens[token] = context;
 
     std::stringstream response;
     response 

@@ -2,6 +2,8 @@
 #define CONTAINERUI_WEBSERVER_CONTEXT_HPP
 
 #include "containerui/request_handler.hpp"
+#include "containerui/auth/authenticator.hpp"
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -20,7 +22,8 @@ struct webserver_context
 
     void add_passthrough(
         std::string const & url,
-        std::string const & remote_url);
+        std::string const & remote_url,
+        authenticator & auth);
 
     void add_passthrough_with_param(
         std::string const & url_template,

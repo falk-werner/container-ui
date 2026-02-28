@@ -1,4 +1,5 @@
 #include "containerui/request.hpp"
+#include <algorithm>
 
 namespace container_ui
 {
@@ -35,6 +36,25 @@ std::string request::get_query_arg(std::string const & key, std::string const & 
 {
    auto const * const value = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, key.c_str());
    return (value != nullptr) ? value : default_value;
+}
+
+std::string request::get_header(std::string const & key, std::string const & default_value)
+{
+   auto const * const value = MHD_lookup_connection_value(connection, MHD_HEADER_KIND, key.c_str());
+   return (value != nullptr) ? value : default_value;
+}
+
+std::string request::get_bearer_token()
+{
+    std::string const prefix = "Bearer ";
+
+    auto header = get_header("Authorization");
+    if (header.starts_with(prefix)) {
+        return header.substr(prefix.size());
+    }
+    else {
+        return "";
+    }
 }
 
 MHD_Result request::respond_empty(unsigned int status_code)

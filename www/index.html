@@ -277,8 +277,19 @@
                 const data = await resp.json();
                 console.log(data);
 
+                const access_token = data.access_token;
+                if (access_token) {
+                    const resp2 = await fetch("/api/info", {
+                        "headers": {
+                            "Authorization": `Bearer ${access_token}`
+                        }
+                    });
 
-                login_successful = true;
+                    const data2 = await resp2.json();
+                    console.log(data2);
+                    
+                    login_successful = true;
+                }
             }
         }
         catch (ex) {

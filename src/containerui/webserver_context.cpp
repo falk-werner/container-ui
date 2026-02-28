@@ -22,9 +22,10 @@ void webserver_context::add_static(
 
 void webserver_context::add_passthrough(
     std::string const & url,
-    std::string const & remote_url)
+    std::string const & remote_url,
+    authenticator & auth)
 {
-    auto handler = std::make_unique<passthrough_handler>(url, remote_url);
+    auto handler = std::make_unique<passthrough_handler>(url, remote_url, auth);
     handlers.emplace_back(std::move(handler));
 }
 

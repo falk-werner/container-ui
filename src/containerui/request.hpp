@@ -17,6 +17,8 @@ struct request
     void * * connection_cls;
 
     std::string get_query_arg(std::string const & key, std::string const & default_value = "");
+    std::string get_header(std::string const & key, std::string const & default_value = "");
+    std::string get_bearer_token();
     MHD_Result respond_empty(unsigned int status_code);    
     MHD_Result respond(unsigned int status_code, std::string const & contents, std::string const & content_type);
     MHD_Result respond_static(unsigned int status_code, std::string const & contents, std::string const & content_type);

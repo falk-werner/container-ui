@@ -1,0 +1,63 @@
+#include "containerui/request.hpp"
+
+namespace container_ui
+{
+
+namespace
+{
+
+MHD_Result respond_generic(
+    MHD_Connection * connection,
+    unsigned int status_code,
+    std::string const & contents,
+    std::string const & content_type,
+    MHD_ResponseMemoryMode policy)
+{
+    auto * const response = MHD_create_response_from_buffer(
+        contents.size(),
+        const_cast<void*>(reinterpret_cast<void const*>(contents.c_str())),
+        policy);
+    if (nullptr == response) {
+        return MHD_NO;
+    }
+
+    MHD_add_response_header(response, "Content-Type", content_type.c_str());
+
+    auto const result = MHD_queue_response(connection, status_code, response);
+    MHD_destroy_response(response);
+    return result;
+}
+
+}
+
+
+std::string request::get_query_arg(std::string const & key, std::string const & default_value)
+{
+   auto const * const value = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, key.c_str());
+   return (value != nullptr) ? value : default_value;
+}
+
+MHD_Result request::respond_empty(unsigned int status_code)
+{
+    auto * const response = MHD_create_response_empty(MHD_RF_NONE);
+    if (nullptr == response) {
+        return MHD_NO;
+    }
+
+    auto const result = MHD_queue_response(connection, status_code, response);
+    MHD_destroy_response(response);
+    return result;
+}
+
+MHD_Result request::respond(unsigned int status_code, std::string const & contents, std::string const & content_type)
+{
+    return respond_generic(connection, status_code, contents, content_type, MHD_RESPMEM_MUST_COPY);
+}
+
+MHD_Result request::respond_static(unsigned int status_code, std::string const & contents, std::string const & content_type)
+{
+    return respond_generic(connection, status_code, contents, content_type, MHD_RESPMEM_PERSISTENT);
+}
+
+
+}

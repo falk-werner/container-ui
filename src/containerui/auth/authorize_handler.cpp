@@ -10,7 +10,7 @@ namespace container_ui
 namespace
 {
 
-constexpr char const auth_html[] = R"(<!DOCTYPE html>
+constexpr char const auth_html_template[] = R"(<!DOCTYPE html>
 <html>
 <head>
     <title>Login</title>
@@ -18,7 +18,13 @@ constexpr char const auth_html[] = R"(<!DOCTYPE html>
 </head>
 <body>
     <form method="post">
-        <input type="hidden" name="challenge" value="challenge" />
+        <input type="hidden" name="challenge" value="${RESPONSE_TYPE}" />
+        <input type="hidden" name="challenge" value="${CLIENT_ID}" />
+        <input type="hidden" name="challenge" value="${REDIRECT_URI}" />
+        <input type="hidden" name="challenge" value="${SCOPE}" />
+        <input type="hidden" name="challenge" value="${STATE}" />
+        <input type="hidden" name="challenge" value="${CODE_CHALLENGE_METHOD}" />
+        <input type="hidden" name="challenge" value="${CODE_CHALLENGE}" />
         <label for="username">Username: </label>
         <input name="username" type="text" />
         <label for="password">Username: </label>
@@ -36,21 +42,70 @@ struct post_context
     std::stringstream contents;
 };
 
-MHD_Result handle_get(request & req)
+void replace(std::string & value, std::string const & what, std::string const & to)
 {
-    auto * const response = MHD_create_response_from_buffer(
-        sizeof(auth_html),
-        const_cast<void*>(reinterpret_cast<void const *>(auth_html)),
-        MHD_RESPMEM_PERSISTENT);
-    if (response == nullptr) {
-        return MHD_NO;
+    auto const pos = value.find(what);
+    if (pos == std::string::npos) {
+        return;
     }
 
-    MHD_add_response_header(response, "Content-Type", "text/html");
+    value.replace(pos, what.size(), to);
+}
 
-    MHD_Result const result = MHD_queue_response(req.connection, MHD_HTTP_OK, response);
-    MHD_destroy_response(response);
-    return result;
+MHD_Result handle_get(request & req)
+{
+    auto const response_type = req.get_query_arg("response_type");
+    if (response_type.empty()) {
+        std::cerr << "error: authorize: missing response_type" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
+    }
+
+    auto const client_id = req.get_query_arg("client_id");
+    if (client_id.empty()) {
+        std::cerr << "error: authorize: missing client_id" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
+    }
+
+    auto const redirect_uri = req.get_query_arg("redirect_uri");
+    if (redirect_uri.empty()) {
+        std::cerr << "error: authorize: missing redirect_uri" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
+    }
+
+    auto const scope = req.get_query_arg("scope");
+    if (scope.empty()) {
+        std::cerr << "error: authorize: missing scope" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
+    }
+
+    auto const state = req.get_query_arg("state");
+    if (state.empty()) {
+        std::cerr << "error: authorize: missing state" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
+    }
+
+    auto const code_challenge_method = req.get_query_arg("code_challenge_method");
+    if (code_challenge_method.empty()) {
+        std::cerr << "error: authorize: missing code_challenge_method" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
+    }
+
+    auto const code_challenge = req.get_query_arg("code_challenge");
+    if (scope.empty()) {
+        std::cerr << "error: authorize: missing code_challenge" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
+    }
+
+    std::string auth_html(auth_html_template);
+    replace(auth_html, "${RESPONSE_TYPE}", response_type);
+    replace(auth_html, "${CLIENT_ID}", client_id);
+    replace(auth_html, "${REDIRECT_URL}", redirect_uri);
+    replace(auth_html, "${SCOPE}", scope);
+    replace(auth_html, "${SCOPE}", state);
+    replace(auth_html, "${CODE_CHALLENGE_METHOD}", code_challenge_method);
+    replace(auth_html, "${CODE_CHALLENGE}", code_challenge);
+
+    return req.respond(MHD_HTTP_OK, auth_html, "text/html");
 }
 
 MHD_Result handle_post(request & req, authenticator & auth)
@@ -148,15 +203,15 @@ bool authorize_handler::handle(request & req, MHD_Result & result)
 
     if (req.method == "GET") {
         result = handle_get(req);
-        return true;
     }
     else if (req.method == "POST") {
         result = handle_post(req, _auth);
-        return true;
     }
     else {
-        return false;
+        result = req.respond_empty(MHD_HTTP_METHOD_NOT_ALLOWED);
     }
+
+    return true;
 }
    
 }

@@ -175,14 +175,60 @@ constexpr const char index[] = R"(<!DOCTYPE html>
         }
     }
 
+    async function sha256(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hash = await window.crypto.subtle.digest("SHA-256", data);
+        return new Uint8Array(hash);
+    }
+
+    function b64url_encode(data) {
+        let encoded = data.toBase64();
+        encoded = encoded.replaceAll("+", "-");
+        encoded = encoded.replaceAll("/", "_");
+        encoded = encoded.replaceAll("=", "");
+        return encoded;
+    }
+
+    function generate_token() {
+        const data = new Uint8Array(42);
+        window.crypto.getRandomValues(data);
+
+        return b64url_encode(data);
+    }
+
+    async function login() {
+        const code_verifier = generate_token();
+        localStorage.setItem("code_verifier", code_verifier);
+
+        const challenge = b64url_encode(await sha256(code_verifier));
+
+        url = "/auth/authorize?" +
+            "response_type=code&" +
+            "client_id=container_ui&" +
+            "redirect_uri=/&" +
+            "scope=container_ui&" +
+            "state=init&" +
+            "code_challenge_method=S256&" +
+            `code_challenge=${challenge}`;
+        
+        window.location.href = url;
+    }
 
     async function startup() {
-        engine_info();
-        system_info();
-        disk_usage();
-        containers();
-        images();
-        volumes();
+        const query_args = new URLSearchParams(window.location.search);
+        if (query_args.size == 0) {
+            login();
+        }
+        else {
+            engine_info();
+            system_info();
+            disk_usage();
+            containers();
+            images();
+            volumes();
+        }
+
     }
 
 

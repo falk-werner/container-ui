@@ -16,22 +16,26 @@ constexpr char const auth_html_template[] = R"(<!DOCTYPE html>
 <head>
     <title>Login</title>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="/style.css"/>
 </head>
 <body>
-    <form method="post">
-        <input type="hidden" name="response_type" value="${RESPONSE_TYPE}" />
-        <input type="hidden" name="client_id" value="${CLIENT_ID}" />
-        <input type="hidden" name="redirect_uri" value="${REDIRECT_URI}" />
-        <input type="hidden" name="scope" value="${SCOPE}" />
-        <input type="hidden" name="state" value="${STATE}" />
-        <input type="hidden" name="code_challenge_method" value="${CODE_CHALLENGE_METHOD}" />
-        <input type="hidden" name="code_challenge" value="${CODE_CHALLENGE}" />
-        <label for="username">Username: </label>
-        <input name="username" type="text" />
-        <label for="password">Username: </label>
-        <input name="password" type="password" />
-        <input type="submit" value="Submit" />
-    </form>
+    <div id="login" class="dialog">
+        <h1>Container UI Login</h1>
+        <form method="post">
+            <input type="hidden" name="response_type" value="${RESPONSE_TYPE}" />
+            <input type="hidden" name="client_id" value="${CLIENT_ID}" />
+            <input type="hidden" name="redirect_uri" value="${REDIRECT_URI}" />
+            <input type="hidden" name="scope" value="${SCOPE}" />
+            <input type="hidden" name="state" value="${STATE}" />
+            <input type="hidden" name="code_challenge_method" value="${CODE_CHALLENGE_METHOD}" />
+            <input type="hidden" name="code_challenge" value="${CODE_CHALLENGE}" />
+            <label for="username">Username: </label>
+            <input name="username" type="text" value="admin"/>
+            <label for="password">Password: </label>
+            <input name="password" type="password" />
+            <input type="submit" value="Login" />
+        </form>
+    </div>
 </body>
 </html>
 )";

@@ -52,6 +52,7 @@ export async function login() {
         const code = query_args.get("code");
         const code_verifier = localStorage.getItem("code_verifier");
         localStorage.removeItem("code_verifier");
+        history.pushState({}, "", "/");
 
         if ((code) && (code_verifier)) {
             const access_token = await get_access_token(code, code_verifier);

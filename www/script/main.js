@@ -118,6 +118,54 @@ async function volumes(api) {
     }
 }
 
+function activate_entry(name) {
+    const menuentries = document.querySelectorAll(".mainmenu li");
+    for(const entry of menuentries) {
+        entry.classList.remove("active");
+    }
+    const entry = document.querySelector(`#menuentry_${name}`);
+    entry.classList.add("active");
+
+    const pages = document.querySelectorAll(".page");
+    for(const page of pages) {
+        page.classList.add("hidden");
+    }
+
+    const home = document.querySelector(`#${name}`);
+    home.classList.remove("hidden");
+}
+
+async function activate_home(api)
+{
+        activate_entry("home");
+}
+
+async function activate_containers(api)
+{
+    activate_entry("containers");
+    containers(api);
+}
+
+async function activate_images(api)
+{
+    activate_entry("images");
+    images(api);
+}
+
+async function activate_volumes(api)
+{
+    activate_entry("volumes");
+    volumes(api);
+}
+
+async function activate_system(api)
+{
+    activate_entry("system");
+    engine_info(api);
+    system_info(api);
+    disk_usage(api);
+}
+
 async function startup() {
     const access_token = await login();
 
@@ -130,12 +178,23 @@ async function startup() {
         main.classList.remove("hidden");
 
         const api = new Api(access_token);
-        engine_info(api);
-        system_info(api);
-        disk_usage(api);
-        containers(api);
-        images(api);
-        volumes(api);
+        document.querySelector("#menuentry_home").addEventListener("click", () => {
+            activate_home(api);
+        });
+        document.querySelector("#menuentry_containers").addEventListener("click", () => {
+            activate_containers(api);
+        });
+        document.querySelector("#menuentry_images").addEventListener("click", () => {
+            activate_images(api);
+        });
+        document.querySelector("#menuentry_volumes").addEventListener("click", () => {
+            activate_volumes(api);
+        });
+        document.querySelector("#menuentry_system").addEventListener("click", () => {
+            activate_system(api);
+        });
+
+        activate_home(api);
     }
     else {
         const login_failed = document.querySelector("#login_failed");

@@ -20,72 +20,100 @@
 
     <div id="main" class="hidden">
 
-        <h1>Container UI</h1>
-        
-        <h2>System</h2>
-        <table>
-            <tr><th>Operating System</th><td id="system_os"></td></tr>
-            <tr><th>Architecture</th><td id="system_arch"></td></tr>
-            <tr><th>CPUs</th><td id="system_ncpu"></td></tr>
-            <tr><th>Memory</th><td id="system_memory"></td></tr>
-        </table>
+        <div id="sidebar">
+            <h1>Container UI</h1>
+            <div class="divider"></div>
+
+            <ul class="mainmenu">
+                <li id="menuentry_home">Home</li>
+                <li id="menuentry_containers">Containers</li>
+                <li id="menuentry_images">Images</li>
+                <li id="menuentry_volumes">Volumes</li>
+                <li id="menuentry_system" class="active">System</li>
+            </ul>
+
+            <div class="divider"></div>
+            <div class="info">Version: 1.0</div>
+        </div>
+
+        <div id="content">
+
+            <div class="page hidden" id="home">
+            </div>
+
+            <div class="page hidden" id="containers">
+                <h2>Containers</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Names</th>
+                            <th>Image</th>
+                            <th>Status</th>
+                            <th>Ports</th>
+                        </tr>
+                    </thead>
+                    <tbody id="containers"></tbody>
+                </table>
+            </div>
+
+            <div class="page hidden" id="images">
+                <h2>Images</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tags</th>
+                            <th>Created</th>
+                            <th>Size</th>
+                        </tr>
+                    </thead>
+                    <tbody id="images"></tbody>
+                </table>
+            </div>
+
+            <div class="page hidden" id="volumes">
+                <h2>Volumes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="volumes"></tbody>
+                </table>
+            </div>
+
+            <div class="page" id="system">
+                <h2>System</h2>
+                <table>
+                    <tr><th>Operating System</th><td id="system_os"></td></tr>
+                    <tr><th>Architecture</th><td id="system_arch"></td></tr>
+                    <tr><th>CPUs</th><td id="system_ncpu"></td></tr>
+                    <tr><th>Memory</th><td id="system_memory"></td></tr>
+                </table>
 
 
-        <h2>Engine</h2>
-        <table>
-            <tr><th>Name</th><td id="engine_name"></td></tr>
-            <tr><th>Version</th><td id="engine_version"></td></tr>
-        </table>  
+                <h2>Engine</h2>
+                <table>
+                    <tr><th>Name</th><td id="engine_name"></td></tr>
+                    <tr><th>Version</th><td id="engine_version"></td></tr>
+                </table>  
 
-        <h2>Disk Usage</h2>
-        <table>
-            <tr><th>Category</th><th>Count</th><th>Total Size</th><th>Reclaimable Size</th></tr>
-            <tr><th>Containers</th><td id="df_container_count"></td><td id="df_container_total"></td><td id="df_container_reclaimable"></td></tr>
-            <tr><th>Images</th><td id="df_image_count"></td><td id="df_image_total"></td><td id="df_image_reclaimable"></td></tr>
-            <tr><th>Volumes</th><td id="df_volume_count"></td><td id="df_volume_total"></td><td id="df_volume_reclaimable"></td></tr>
-            <tr><th>Build Cache</th><td id="df_bcache_count"></td><td id="df_bcache_total"></td><td id="df_bcache_reclaimable"></td></tr>
-        </table>
-
-        <h2>Containers</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Names</th>
-                    <th>Image</th>
-                    <th>Status</th>
-                    <th>Ports</th>
-                </tr>
-            </thead>
-            <tbody id="containers"></tbody>
-        </table>
-
-        <h2>Images</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tags</th>
-                    <th>Created</th>
-                    <th>Size</th>
-                </tr>
-            </thead>
-            <tbody id="images"></tbody>
-        </table>
-
-        <h2>Volumes</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Created</th>
-                </tr>
-            </thead>
-            <tbody id="volumes"></tbody>
-        </table>
+                <h2>Disk Usage</h2>
+                <table>
+                    <tr><th>Category</th><th>Count</th><th>Total Size</th><th>Reclaimable Size</th></tr>
+                    <tr><th>Containers</th><td id="df_container_count"></td><td id="df_container_total"></td><td id="df_container_reclaimable"></td></tr>
+                    <tr><th>Images</th><td id="df_image_count"></td><td id="df_image_total"></td><td id="df_image_reclaimable"></td></tr>
+                    <tr><th>Volumes</th><td id="df_volume_count"></td><td id="df_volume_total"></td><td id="df_volume_reclaimable"></td></tr>
+                    <tr><th>Build Cache</th><td id="df_bcache_count"></td><td id="df_bcache_total"></td><td id="df_bcache_reclaimable"></td></tr>
+                </table>
+            </div>
+            
+        </div>
 
     </div>
-
 
 </body>
 </html>

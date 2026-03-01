@@ -1,6 +1,8 @@
 #include "containerui/auth/authenticator.hpp"
 #include "containerui/util/timestamp.hpp"
 #include "containerui/util/token.hpp"
+#include "containerui/util/b64.hpp"
+#include "containerui/util/sha256.hpp"
 
 #include <iostream>
 #include <algorithm>
@@ -102,7 +104,11 @@ std::string authenticator::get_token(
         return "{\"error\":\"invalid code\"}";
     }
 
-    // ToDo: check code_verifier
+    auto const computed_challenge = b64url_encode(sha256(code_verifier));
+    if (computed_challenge != entry->second.challenge) {
+        codes.erase(entry);
+        return "{\"error\":\"invalid code verifier\"}";
+    }
 
     codes.erase(entry);
 

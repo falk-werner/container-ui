@@ -45,31 +45,24 @@ async function disk_usage(api) {
 
 async function containers(api) {
     const data = await api.containers();
-    const element = document.querySelector("#containers");
+    const element = document.querySelector("#containers_list");
+    element.innerHTML = "";
 
     for(const container of data) {
         const tr = document.createElement("tr");
         element.appendChild(tr);
 
-        const id = document.createElement("td");
-        id.textContent = container.Id;
-        tr.appendChild(id);
+        const name = document.createElement("td");
+        name.textContent = container.Names[0].substring(1);
+        tr.appendChild(name);
 
-        const names = document.createElement("td");
-        names.textContent = container.Names.map((name) => name.substring(1)).join(" ");
-        tr.appendChild(names);
+        const state = document.createElement("td");
+        state.textContent = container.State;
+        tr.appendChild(state);
 
         const image = document.createElement("td");
         image.textContent = container.Image;
         tr.appendChild(image);
-
-        const status = document.createElement("td");
-        status.textContent = container.Status;
-        tr.appendChild(status);
-
-        const ports = document.createElement("td");
-        ports.textContent = container.Ports.join(" ");
-        tr.appendChild(ports);
     }    
 }
 
@@ -135,9 +128,52 @@ function activate_entry(name) {
     home.classList.remove("hidden");
 }
 
+function init_home(api)
+{
+    document.querySelector("#menuentry_home").addEventListener("click", () => {
+        activate_home(api);
+    });
+
+    document.querySelector("#home_containers").addEventListener("click", () => {
+        activate_containers(api);
+    });
+
+    document.querySelector("#home_images").addEventListener("click", () => {
+        activate_images(api);
+    });
+
+    document.querySelector("#home_volumes").addEventListener("click", () => {
+        activate_volumes(api);
+    });
+
+}
+
 async function activate_home(api)
 {
-        activate_entry("home");
+    const version = await api.version();
+    set_text("#home_engine_version", `${version.Platform.Name} / ${version.Version}`);
+
+    const info = await api.info();
+    set_text("#home_name", info.Name);
+    set_text("#home_arch", info.Architecture);
+    set_text("#home_ncpu", info.NCPU);
+    set_text("#home_memory", format_mem(info.MemTotal));
+
+    activate_entry("home");
+    const df = await api.disk_usage();
+    let running = 0;
+    for(const container of df.Containers) {
+        if (container.State === "running") {
+            running++;
+        }
+    }
+
+    document.querySelector("#home_containers_running").textContent = running;
+    document.querySelector("#home_containers_total").textContent = df.ContainerUsage.TotalCount;
+    document.querySelector("#home_images_active").textContent = df.ImageUsage.ActiveCount;
+    document.querySelector("#home_images_total").textContent = df.ImageUsage.TotalCount;
+    document.querySelector("#home_volumes_active").textContent = df.VolumeUsage.ActiveCount;
+    document.querySelector("#home_volumes_total").textContent = df.VolumeUsage.TotalCount;
 }
 
 async function activate_containers(api)
@@ -178,9 +214,7 @@ async function startup() {
         main.classList.remove("hidden");
 
         const api = new Api(access_token);
-        document.querySelector("#menuentry_home").addEventListener("click", () => {
-            activate_home(api);
-        });
+        init_home(api);
         document.querySelector("#menuentry_containers").addEventListener("click", () => {
             activate_containers(api);
         });

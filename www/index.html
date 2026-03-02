@@ -39,26 +39,70 @@
         <div id="content">
 
             <div class="page hidden" id="home">
+                <h1>Home</h1>
+                <table>
+                    <tr>
+                        <td>Name</td>
+                        <td id="home_name"></td>
+                    </tr>
+                    <tr>
+                        <td>Engine / Version</td>
+                        <td id="home_engine_version"></td>
+                    </tr>
+                    <tr>
+                        <td>Architecture</td>
+                        <td id="home_arch"></td>
+                    </tr>
+                    <tr>
+                        <td>CPUs</td>
+                        <td id="home_ncpu"></td>
+                    </tr>
+                    <tr>
+                        <td>Memory</td>
+                        <td id="home_memory"></td>
+                    </tr>
+                </table>
+                <div class="content">
+                    <div id="home_containers">
+                        <h2>Containers</h2>
+                        <div>
+                            Running:<span id="home_containers_running"></span>
+                            Total:<span id="home_containers_total"></span>
+                        </div>
+                    </div>
+                    <div id="home_images">
+                        <h2>Images</h2>
+                        <div>
+                            Active:<span id="home_images_active"></span>
+                            Total:<span id="home_images_total"></span>
+                        </div>
+                    </div>
+                    <div id="home_volumes">
+                        <h2>Volumes</h2>
+                        <div>
+                            Active:<span id="home_volumes_active"></span>
+                            Total:<span id="home_volumes_total"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="page hidden" id="containers">
-                <h2>Containers</h2>
+                <h1>Containers</h1>
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Names</th>
-                            <th>Image</th>
+                            <th>Name</th>
                             <th>Status</th>
-                            <th>Ports</th>
+                            <th>Image</th>
                         </tr>
                     </thead>
-                    <tbody id="containers"></tbody>
+                    <tbody id="containers_list"></tbody>
                 </table>
             </div>
 
             <div class="page hidden" id="images">
-                <h2>Images</h2>
+                <h1>Images</h1>
                 <table>
                     <thead>
                         <tr>
@@ -73,7 +117,7 @@
             </div>
 
             <div class="page hidden" id="volumes">
-                <h2>Volumes</h2>
+                <h1>Volumes</h1>
                 <table>
                     <thead>
                         <tr>
@@ -86,7 +130,7 @@
             </div>
 
             <div class="page" id="system">
-                <h2>System</h2>
+                <h1>System</h1>
                 <table>
                     <tr><th>Operating System</th><td id="system_os"></td></tr>
                     <tr><th>Architecture</th><td id="system_arch"></td></tr>
@@ -95,13 +139,13 @@
                 </table>
 
 
-                <h2>Engine</h2>
+                <h1>Engine</h1>
                 <table>
                     <tr><th>Name</th><td id="engine_name"></td></tr>
                     <tr><th>Version</th><td id="engine_version"></td></tr>
                 </table>  
 
-                <h2>Disk Usage</h2>
+                <h1>Disk Usage</h1>
                 <table>
                     <tr><th>Category</th><th>Count</th><th>Total Size</th><th>Reclaimable Size</th></tr>
                     <tr><th>Containers</th><td id="df_container_count"></td><td id="df_container_total"></td><td id="df_container_reclaimable"></td></tr>

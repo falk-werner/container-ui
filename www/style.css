@@ -2,14 +2,7 @@ html, body {
     font-family: Courier New, Monospace;
     height: 100vh;
     margin: 0;
-}
-
-tr {
-    text-align: left;
-}
-
-td {
-    text-align: right;
+    background-color: #f0f0f0;
 }
 
 table, tr, th, td {
@@ -30,9 +23,8 @@ table {
 }
 
 .dialog {
-    height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     overflow: hidden;
 }
@@ -106,13 +98,11 @@ table {
     text-align: center;
 }
 
+/*
 #content {
     flex: 1 0 auto;
 }
-
-#login {
-    flex-direction: column;
-}
+*/
 
 #login form {
     min-width: 300px;
@@ -127,3 +117,73 @@ table {
     margin-bottom: 20px;
 }
 
+/* */
+
+.page {
+    padding: 5px;
+}
+
+/* Home */
+
+#home table {
+    width: 100%;
+    margin-top: 20px;
+    margin-left: 0px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+}
+
+#home tr {
+    background-color: white;
+}
+
+#home td {
+    width: 50%;
+}
+#home table, #home tr, #home td {
+    border: 0 none;
+}
+
+
+#home .content > div {
+    display: inline-block;
+    border: 1px solid black;
+    min-width: 400px;
+    cursor: pointer;
+    margin-right:20px;
+    margin-bottom:20px;
+}
+
+#home .content > div > h2 {
+    background-color: black;
+    color: white;
+    margin: 0;
+    padding: 10px;
+    transition: background-color 1s ease;
+}
+
+#home .content > div:hover > h2 {
+    background-color: #308964;
+}
+
+#home .content > div > div {
+    text-align: right;
+    padding-right: 10px;
+}
+
+/* Container List */
+
+#containers th {
+    background-color: black;
+    color: white;
+}
+
+#containers_list tr {
+    cursor: pointer;
+    transition: background-color 1s ease;
+}
+
+#containers_list tr:hover {
+    background-color: #308964;
+}

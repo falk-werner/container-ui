@@ -40,4 +40,24 @@ export class Api {
     async volumes() {
         return await this.#fetch_json("api/volumes");
     }
+
+    async create_volume(name) {
+        const response = await fetch("api/volumes/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.#access_token}`
+            },
+            body: JSON.stringify({
+                "Driver": "local",
+                "DriverOpts": {},
+                "Labels": {},
+                "Name": name
+            })
+        });
+
+        if ((response.status < 200) || (300 <= response.status)) {
+            throw new Error();
+        }
+    }
 }

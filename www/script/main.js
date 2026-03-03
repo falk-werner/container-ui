@@ -99,6 +99,7 @@ async function images(api) {
 async function volumes(api) {
     const data = await api.volumes();
     const element = document.querySelector("#volumes_list");
+    element.innerHTML = "";
 
     for(const volume of data.Volumes) {
         const tr = document.createElement("tr");
@@ -224,9 +225,21 @@ async function startup() {
         document.querySelector("#menuentry_images").addEventListener("click", () => {
             activate_images(api);
         });
+
         document.querySelector("#menuentry_volumes").addEventListener("click", () => {
             activate_volumes(api);
         });
+        document.querySelector("#volumes_new").addEventListener('click', async () => {
+            try {
+                const name = document.querySelector("#volumes_new_name");
+                await api.create_volume(name.value);
+                activate_volumes(api);
+            }
+            catch (ex) {
+                console.log(ex);
+            }
+        });
+
         document.querySelector("#menuentry_system").addEventListener("click", () => {
             activate_system(api);
         });

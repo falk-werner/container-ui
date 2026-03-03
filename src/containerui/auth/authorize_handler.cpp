@@ -81,10 +81,12 @@ MHD_Result handle_get(request & req)
 MHD_Result handle_post(request & req, authenticator & auth)
 {
     MHD_Result result = MHD_NO;
-    std::unordered_map<std::string, std::string> data;
-    if (!update_post_data(req, result, data)) {
+    std::string raw_data;
+    if (!update_post_data(req, result, raw_data)) {
         return result;
     }
+    std::unordered_map<std::string, std::string> data;
+    parse_post_data(raw_data, data);
 
     if (!data.contains("connect_token")) {
         std::cerr << "error: missing connect_token" << std::endl;

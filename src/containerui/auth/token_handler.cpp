@@ -22,10 +22,12 @@ bool token_handler::handle(request & req, MHD_Result & result)
         return true;
     }
 
-    std::unordered_map<std::string, std::string> data;
-    if (!update_post_data(req, result, data)) {
+    std::string raw_data;
+    if (!update_post_data(req, result, raw_data)) {
         return true;
     }
+    std::unordered_map<std::string, std::string> data;
+    parse_post_data(raw_data, data);
 
     std::vector<std::string> required_keys = {
         "grant_type",

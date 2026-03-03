@@ -48,7 +48,7 @@ void parse_post_data(
 bool update_post_data(
     request & req,
     MHD_Result & result,
-    std::unordered_map<std::string, std::string> & map)
+    std::string & data)
 {
     if ((*req.connection_cls) == nullptr)
     {
@@ -80,7 +80,7 @@ bool update_post_data(
         return false;
     }
 
-    parse_post_data(context->contents.str(), map);
+    data = context->contents.str();
     delete context;
     *req.connection_cls = nullptr;
 

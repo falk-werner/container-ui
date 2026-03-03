@@ -17,7 +17,7 @@ void parse_post_data(
 bool update_post_data(
     request & req,
     MHD_Result & result,
-    std::unordered_map<std::string, std::string> & map);
+    std::string & data);
 
 }
 

@@ -52,6 +52,7 @@ add_library(container-ui-static STATIC
     src/containerui/static_resource_handler.cpp
     src/containerui/api/passthrough_handler.cpp
     src/containerui/api/passthrough_with_param_handler.cpp
+    src/containerui/api/create_volume_handler.cpp
     src/containerui/request.cpp
     src/containerui/webserver.cpp
     src/containerui/webserver_context.cpp

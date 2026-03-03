@@ -4,6 +4,7 @@
 #include "containerui/auth/authorize_handler.hpp"
 #include "containerui/auth/token_handler.hpp"
 #include "containerui/auth/authenticator.hpp"
+#include "containerui/api/api_handlers.hpp"
 
 #include <unistd.h>
 
@@ -16,6 +17,7 @@ using container_ui::webserver_context;
 using container_ui::authorize_handler;
 using container_ui::token_handler;
 using container_ui::authenticator;
+using container_ui::create_volume_handler;
 
 namespace
 {
@@ -68,8 +70,8 @@ void add_api_handlers(webserver_context& context, authenticator& auth)
 
     // volumes
     context.add_passthrough("volumes", auth);
+    context.add(std::make_unique<create_volume_handler>(auth));
     context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}", auth);
-
 }
 
 

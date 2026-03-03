@@ -48,26 +48,27 @@ void add_oauth_handlers(webserver_context& context, authenticator& auth)
 void add_api_handlers(webserver_context& context, authenticator& auth)
 {
     // sytem
-    context.add_passthrough("/api/version", "http://localhost/version", auth);
-    context.add_passthrough("/api/info", "http://localhost/info", auth);
-    context.add_passthrough("/api/system/df", "http://localhost/system/df", auth);
+    context.add_passthrough("version", auth);
+    context.add_passthrough("info", auth);
+    context.add_passthrough("system/df", auth);
 
     // containers
-    context.add_passthrough("/api/containers/json", "http://localhost/containers/json?all=true", auth);
+    context.add_passthrough("containers/json", auth);
     context.add_passthrough_with_param("/api/containers/{name}/logs",
         "http://localhost/containers/{name}/logs?follow=false&stderr=true&stdout=true&timestamps=true",
+        auth,
         "text/plain");
-    context.add_passthrough_with_param("/api/containers/{name}/json", "http://localhost/containers/{name}/json");
-    context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top?ps_args=-eTopid,ppid,spid,pcpu,pmem,vsz,cmd");
-    context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats?oneshot=true&stream=false");
+    context.add_passthrough_with_param("/api/containers/{name}/json", "http://localhost/containers/{name}/json", auth);
+    context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top?ps_args=-eTopid,ppid,spid,pcpu,pmem,vsz,cmd", auth);
+    context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats?oneshot=true&stream=false", auth);
 
     // images
-    context.add_passthrough("/api/images/json", "http://localhost/images/json?all=true", auth);
-    context.add_passthrough_with_param("/api/images/{name}/json", "http://localhost/images/{name}/json");
+    context.add_passthrough("images/json", auth);
+    context.add_passthrough_with_param("/api/images/{name}/json", "http://localhost/images/{name}/json", auth);
 
     // volumes
-    context.add_passthrough("/api/volumes", "http://localhost/volumes", auth);
-    context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}");
+    context.add_passthrough("volumes", auth);
+    context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}", auth);
 
 }
 

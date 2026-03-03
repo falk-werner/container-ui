@@ -47,8 +47,10 @@ std::string check_url(
 passthrough_with_param_handler::passthrough_with_param_handler(
     std::string const & url_template,
     std::string const & remote_url_template,
-    std::string const & mimetype)
+    std::string const & mimetype,
+    authenticator & auth)
 : _mimetype(mimetype)
+, _auth(auth)
 {
     auto param_pos = url_template.find("{name}");
     if (param_pos == std::string::npos) {
@@ -76,6 +78,12 @@ bool passthrough_with_param_handler::handle(
     if (param.empty()) { return false; }
     if (req.method != "GET") {
         result = req.respond_empty(MHD_HTTP_METHOD_NOT_ALLOWED);
+        return true;
+    }
+
+    auto const token = req.get_bearer_token();
+    if (!_auth.is_token_valid(token)) {
+        result = req.respond_empty(MHD_HTTP_FORBIDDEN);
         return true;
     }
 

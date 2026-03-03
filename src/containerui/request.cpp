@@ -31,6 +31,29 @@ MHD_Result respond_generic(
 
 }
 
+namespace
+{
+MHD_Result get_all_query_args_iter(
+    void *cls,
+    enum MHD_ValueKind kind,
+    const char *key,
+    const char *value)
+{
+    auto * args = reinterpret_cast<std::vector<query_arg>*>(cls);
+    args->push_back({key, value});    
+    return MHD_YES;
+}
+
+}
+
+std::vector<query_arg> request::get_all_query_args()
+{
+    std::vector<query_arg> args;
+    void * context = reinterpret_cast<void*>(&args);
+
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, get_all_query_args_iter, context);
+    return args;
+}
 
 std::string request::get_query_arg(std::string const & key, std::string const & default_value)
 {

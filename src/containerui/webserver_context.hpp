@@ -22,13 +22,13 @@ struct webserver_context
         std::string const & mimetype);
 
     void add_passthrough(
-        std::string const & url,
-        std::string const & remote_url,
+        std::string const & path,
         authenticator & auth);
 
     void add_passthrough_with_param(
         std::string const & url_template,
         std::string const & remote_url_template,
+        authenticator & auth,
         std::string const & mimetpye = "application/json");
 
     std::vector<std::unique_ptr<request_handler>> handlers;

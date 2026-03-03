@@ -30,11 +30,11 @@ export class Api {
     }
 
     async containers() {
-        return await this.#fetch_json("api/containers/json");
+        return await this.#fetch_json("api/containers/json?all=true");
     }
 
     async images() {
-        return await this.#fetch_json("api/images/json");
+        return await this.#fetch_json("api/images/json?all=true");
     }
 
     async volumes() {

@@ -3,9 +3,16 @@
 
 #include <microhttpd.h>
 #include <string>
+#include <vector>
 
 namespace container_ui
 {
+
+struct query_arg
+{
+    std::string key;
+    std::string value;
+};
 
 struct request
 {
@@ -16,6 +23,7 @@ struct request
     size_t * upload_data_size;
     void * * connection_cls;
 
+    std::vector<query_arg> get_all_query_args();
     std::string get_query_arg(std::string const & key, std::string const & default_value = "");
     std::string get_header(std::string const & key, std::string const & default_value = "");
     std::string get_bearer_token();

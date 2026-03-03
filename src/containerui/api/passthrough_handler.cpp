@@ -1,17 +1,18 @@
 #include "containerui/api/api_handlers.hpp"
 #include "containerui/util/fetch.hpp"
+#include "containerui/util/url_util.hpp"
 
 #include <iostream>
+#include <sstream>
 
 namespace container_ui
 {
 
 passthrough_handler::passthrough_handler(
-    std::string const url,
-    std::string remote_url,
+    std::string const & path,
     authenticator & auth)
-: _url(url)
-, _remote_url(remote_url)
+: _url(std::string("/api/") + path)
+, _remote_url(std::string("http://localhost/") + path)
 , _auth(auth)
 {
 
@@ -33,8 +34,15 @@ bool passthrough_handler::handle(
         return true;
     }
 
+    std::stringstream url;
+    url << _remote_url;
+    char sep = '?';
+    for(auto const & entry: req.get_all_query_args()) {
+        url << sep << url_encode(entry.key) << '=' << url_encode(entry.value);
+        sep = '&';
+    }
 
-    auto const resp = fetch(_remote_url, "/var/run/docker.sock");
+    auto const resp = fetch(url.str(), "/var/run/docker.sock");
     result = req.respond(resp.status, resp.contents, "application/json");
     return true;
 }

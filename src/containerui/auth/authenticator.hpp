@@ -34,8 +34,7 @@ public:
         std::string const& state,
         std::string const& code_challenge_method,
         std::string const& code_challenge,
-        std::string const& username,
-        std::string const& password);
+        std::string const& connect_token);
 
     std::string get_token(
         std::string const& grant_type,
@@ -50,7 +49,7 @@ public:
 private:
     void check_codes_and_tokens();
 
-    std::string const initial_password;
+    std::string const _connect_token;
     std::unordered_map<std::string, code_context> codes;
     std::unordered_map<std::string, token_context> tokens;
 };

@@ -68,19 +68,22 @@ async function containers(api) {
 
 async function images(api) {
     const data = await api.images();
-    const element = document.querySelector("#images");
+    const element = document.querySelector("#images_list");
 
     for(const image of data) {
         const tr = document.createElement("tr");
         element.appendChild(tr);
 
-        const id = document.createElement("td");
-        id.textContent = image.Id;
-        tr.appendChild(id);
+        const tags_id = document.createElement("td");
+        tr.appendChild(tags_id);
 
-        const tags = document.createElement("td");
+        const tags = document.createElement("div");
         tags.textContent = image.RepoTags.join(" ");
-        tr.appendChild(tags);
+        tags_id.appendChild(tags);
+
+        const id = document.createElement("div");
+        id.textContent = image.Id;
+        tags_id.appendChild(id);
 
         const created = document.createElement("td");
         created.textContent = new Date(image.Created * 1000).toISOString();
@@ -95,7 +98,7 @@ async function images(api) {
 
 async function volumes(api) {
     const data = await api.volumes();
-    const element = document.querySelector("#volumes");
+    const element = document.querySelector("#volumes_list");
 
     for(const volume of data.Volumes) {
         const tr = document.createElement("tr");

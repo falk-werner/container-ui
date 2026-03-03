@@ -17,7 +17,8 @@ struct webserver_context
 
     void add_static(
         std::string const & url,
-        std::string const & contents,
+        unsigned char * data,
+        unsigned int size,
         std::string const & mimetype);
 
     void add_passthrough(

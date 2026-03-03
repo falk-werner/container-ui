@@ -11,9 +11,16 @@ find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(MHD REQUIRED libmicrohttpd IMPORTED_TARGET)
+pkg_check_modules(NLOHMANN_JSON REQUIRED nlohmann_json IMPORTED_TARGET)
 
 add_custom_command(
-    OUTPUT  index_html.c style_css.c script_main_js.c script_api_js.c script_login_js.c script_util.js
+    OUTPUT
+        index_html.c
+        style_css.c
+        script_main_js.c
+        script_api_js.c
+        script_login_js.c
+        script_util_js.c
     COMMAND xxd -n index_html -i
               ${CMAKE_CURRENT_SOURCE_DIR}/www/index.html
               ${CMAKE_CURRENT_BINARY_DIR}/index_html.c
@@ -32,13 +39,19 @@ add_custom_command(
     COMMAND xxd -n script_util_js -i
               ${CMAKE_CURRENT_SOURCE_DIR}/www/script/util.js
               ${CMAKE_CURRENT_BINARY_DIR}/script_util_js.c
-    DEPENDS www/index.html www/style.css www/script/main.js www/script/api.js www/script/login.js www/script/util.js
+    DEPENDS
+        www/index.html
+        www/style.css
+        www/script/main.js
+        www/script/api.js
+        www/script/login.js
+        www/script/util.js
 )
 
 add_library(container-ui-static STATIC
     src/containerui/static_resource_handler.cpp
-    src/containerui/passthrough_handler.cpp
-    src/containerui/passthrough_with_param_handler.cpp
+    src/containerui/api/passthrough_handler.cpp
+    src/containerui/api/passthrough_with_param_handler.cpp
     src/containerui/request.cpp
     src/containerui/webserver.cpp
     src/containerui/webserver_context.cpp
@@ -60,7 +73,7 @@ add_library(container-ui-static STATIC
     ${CMAKE_CURRENT_BINARY_DIR}/script_util_js.c
 )
 target_include_directories(container-ui-static PUBLIC src)
-target_link_libraries(container-ui-static PUBLIC PkgConfig::MHD CURL::libcurl OpenSSL::Crypto)
+target_link_libraries(container-ui-static PUBLIC PkgConfig::NLOHMANN_JSON PkgConfig::MHD CURL::libcurl OpenSSL::Crypto)
 
 
 add_executable(container-ui src/main.cpp)

@@ -12,9 +12,9 @@ namespace container_ui
 {
 
 authenticator::authenticator()
-: initial_password(generate_token())
+: _connect_token(generate_token())
 {
-    std::cout << "initial admin password: " << initial_password << std::endl;
+    std::cout << "connect token: " << _connect_token << std::endl;
 }
 
 std::string authenticator::authenticate(
@@ -25,8 +25,7 @@ std::string authenticator::authenticate(
     std::string const& state,
     std::string const& code_challenge_method,
     std::string const& code_challenge,
-    std::string const& username,
-    std::string const& password)
+    std::string const& connect_token)
 {
     check_codes_and_tokens();
 
@@ -56,7 +55,7 @@ std::string authenticator::authenticate(
         return "/?error=unknown%20code_challenge_method";
     }
 
-    if ((username != "admin") || (password != initial_password))
+    if (connect_token != _connect_token)
     {
         return "/?error=authentication%20failed";
     }

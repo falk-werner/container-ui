@@ -6,7 +6,8 @@ RUN apk add --no-cache \
     xxd \
     curl-dev \
     openssl-dev \
-    libmicrohttpd-dev
+    libmicrohttpd-dev \
+    nlohmann-json
 
 COPY . /src
 WORKDIR /src

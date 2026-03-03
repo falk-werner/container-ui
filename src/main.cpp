@@ -29,6 +29,49 @@ void on_shutdown_requested(int signr)
 
 }
 
+void add_webcontent(webserver_context & context)
+{
+    context.add_static("/", index_html, index_html_len, "text/html");
+    context.add_static("/style.css", style_css, style_css_len, "text/css");
+    context.add_static("/script/main.js", script_main_js, script_main_js_len, "text/javascript");
+    context.add_static("/script/api.js", script_api_js, script_api_js_len, "text/javascript");
+    context.add_static("/script/login.js", script_login_js, script_login_js_len, "text/javascript");
+    context.add_static("/script/util.js", script_util_js, script_util_js_len, "text/javascript");
+}
+
+void add_oauth_handlers(webserver_context& context, authenticator& auth)
+{
+    context.add(std::make_unique<authorize_handler>("/auth/authorize", auth));
+    context.add(std::make_unique<token_handler>("/auth/token", auth));
+}
+
+void add_api_handlers(webserver_context& context, authenticator& auth)
+{
+    // sytem
+    context.add_passthrough("/api/version", "http://localhost/version", auth);
+    context.add_passthrough("/api/info", "http://localhost/info", auth);
+    context.add_passthrough("/api/system/df", "http://localhost/system/df", auth);
+
+    // containers
+    context.add_passthrough("/api/containers/json", "http://localhost/containers/json?all=true", auth);
+    context.add_passthrough_with_param("/api/containers/{name}/logs",
+        "http://localhost/containers/{name}/logs?follow=false&stderr=true&stdout=true&timestamps=true",
+        "text/plain");
+    context.add_passthrough_with_param("/api/containers/{name}/json", "http://localhost/containers/{name}/json");
+    context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top?ps_args=-eTopid,ppid,spid,pcpu,pmem,vsz,cmd");
+    context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats?oneshot=true&stream=false");
+
+    // images
+    context.add_passthrough("/api/images/json", "http://localhost/images/json?all=true", auth);
+    context.add_passthrough_with_param("/api/images/{name}/json", "http://localhost/images/{name}/json");
+
+    // volumes
+    context.add_passthrough("/api/volumes", "http://localhost/volumes", auth);
+    context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}");
+
+}
+
+
 }
 
 int main(int argc, char * argv[])
@@ -44,34 +87,9 @@ int main(int argc, char * argv[])
         authenticator auth;
 
         webserver_context context;
-        context.add_static("/", std::string(reinterpret_cast<char*>(index_html), index_html_len), "text/html");
-        context.add_static("/style.css", std::string(reinterpret_cast<char*>(style_css), style_css_len), "text/css");
-        context.add_static("/script/main.js", std::string(reinterpret_cast<char*>(script_main_js), script_main_js_len), "text/javascript");
-        context.add_static("/script/api.js", std::string(reinterpret_cast<char*>(script_api_js), script_api_js_len), "text/javascript");
-        context.add_static("/script/login.js", std::string(reinterpret_cast<char*>(script_login_js), script_login_js_len), "text/javascript");
-        context.add_static("/script/util.js", std::string(reinterpret_cast<char*>(script_util_js), script_util_js_len), "text/javascript");
-
-
-        context.add(std::make_unique<authorize_handler>("/auth/authorize", auth));
-        context.add(std::make_unique<token_handler>("/auth/token", auth));
-
-        context.add_passthrough("/api/version", "http://localhost/version", auth);
-        context.add_passthrough("/api/info", "http://localhost/info", auth);
-        context.add_passthrough("/api/system/df", "http://localhost/system/df", auth);
-
-        context.add_passthrough("/api/containers/json", "http://localhost/containers/json?all=true", auth);
-        context.add_passthrough_with_param("/api/containers/{name}/logs",
-            "http://localhost/containers/{name}/logs?follow=false&stderr=true&stdout=true&timestamps=true",
-            "text/plain");
-        context.add_passthrough_with_param("/api/containers/{name}/json", "http://localhost/containers/{name}/json");
-        context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top?ps_args=-eTopid,ppid,spid,pcpu,pmem,vsz,cmd");
-        context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats?oneshot=true&stream=false");
-
-        context.add_passthrough("/api/images/json", "http://localhost/images/json?all=true", auth);
-        context.add_passthrough_with_param("/api/images/{name}/json", "http://localhost/images/{name}/json");
-
-        context.add_passthrough("/api/volumes", "http://localhost/volumes", auth);
-        context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}");
+        add_webcontent(context);
+        add_oauth_handlers(context,auth);
+        add_api_handlers(context, auth);
 
         webserver server(8888, std::move(context));
 

@@ -1,7 +1,6 @@
 #include "containerui/webserver_context.hpp"
 #include "containerui/static_resource_handler.hpp"
-#include "containerui/passthrough_handler.hpp"
-#include "containerui/passthrough_with_param_handler.hpp"
+#include "containerui/api/api_handlers.hpp"
 
 namespace container_ui
 {
@@ -13,9 +12,11 @@ void webserver_context::add(std::unique_ptr<request_handler> handler)
 
 void webserver_context::add_static(
     std::string const & url,
-    std::string const & contents,
+    unsigned char * data,
+    unsigned int size,
     std::string const & mimetype)
 {
+    std::string contents(reinterpret_cast<char*>(data), size);
     auto handler = std::make_unique<static_resource_handler>(url, contents, mimetype);
     handlers.emplace_back(std::move(handler));
 }

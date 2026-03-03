@@ -11,7 +11,7 @@ namespace container_ui
 namespace
 {
 
-constexpr char const auth_html_template[] = R"(<!DOCTYPE html>
+constexpr char const auth_html[] = R"(<!DOCTYPE html>
 <html>
 <head>
     <title>Login</title>
@@ -22,17 +22,8 @@ constexpr char const auth_html_template[] = R"(<!DOCTYPE html>
     <div id="login" class="dialog">
         <h1>Container UI Login</h1>
         <form method="post">
-            <input type="hidden" name="response_type" value="${RESPONSE_TYPE}" />
-            <input type="hidden" name="client_id" value="${CLIENT_ID}" />
-            <input type="hidden" name="redirect_uri" value="${REDIRECT_URI}" />
-            <input type="hidden" name="scope" value="${SCOPE}" />
-            <input type="hidden" name="state" value="${STATE}" />
-            <input type="hidden" name="code_challenge_method" value="${CODE_CHALLENGE_METHOD}" />
-            <input type="hidden" name="code_challenge" value="${CODE_CHALLENGE}" />
-            <label for="username">Username: </label>
-            <input name="username" type="text" value="admin"/>
-            <label for="password">Password: </label>
-            <input name="password" type="password" />
+            <label for="connect_token">Connect Token: </label>
+            <input name="connect_token" type="password"/>
             <input type="submit" value="Login" />
         </form>
     </div>
@@ -94,15 +85,6 @@ MHD_Result handle_get(request & req)
         return req.respond_empty(MHD_HTTP_BAD_REQUEST);
     }
 
-    std::string auth_html(auth_html_template);
-    replace(auth_html, "${RESPONSE_TYPE}", response_type);
-    replace(auth_html, "${CLIENT_ID}", client_id);
-    replace(auth_html, "${REDIRECT_URI}", redirect_uri);
-    replace(auth_html, "${SCOPE}", scope);
-    replace(auth_html, "${STATE}", state);
-    replace(auth_html, "${CODE_CHALLENGE_METHOD}", code_challenge_method);
-    replace(auth_html, "${CODE_CHALLENGE}", code_challenge);
-
     return req.respond(MHD_HTTP_OK, auth_html, "text/html");
 }
 
@@ -114,36 +96,20 @@ MHD_Result handle_post(request & req, authenticator & auth)
         return result;
     }
 
-    std::vector<std::string> required_keys = {
-        "response_type",
-        "client_id",
-        "redirect_uri",
-        "scope",
-        "state",
-        "code_challenge_method",
-        "code_challenge",
-        "username",
-        "password"
-    };
-
-    for(auto const & key: required_keys) {
-        if (!data.contains(key)) {
-            std::cerr << "error: missing " << key << std::endl;
-            return req.respond_empty(MHD_HTTP_BAD_REQUEST);
-        }
+    if (!data.contains("connect_token")) {
+        std::cerr << "error: missing connect_token" << std::endl;
+        return req.respond_empty(MHD_HTTP_BAD_REQUEST);
     }
 
-
     std::string const url = auth.authenticate(
-        data.at("response_type"),
-        data.at("client_id"),
-        data.at("redirect_uri"),
-        data.at("scope"),
-        data.at("state"),
-        data.at("code_challenge_method"),
-        data.at("code_challenge"),
-        data.at("username"),
-        data.at("password"));
+        req.get_query_arg("response_type"),
+        req.get_query_arg("client_id"),
+        req.get_query_arg("redirect_uri"),
+        req.get_query_arg("scope"),
+        req.get_query_arg("state"),
+        req.get_query_arg("code_challenge_method"),
+        req.get_query_arg("code_challenge"),
+        data.at("connect_token"));
 
     if (url.empty()) {
         return req.respond_empty(MHD_HTTP_BAD_REQUEST);

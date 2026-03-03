@@ -31,16 +31,6 @@ constexpr char const auth_html[] = R"(<!DOCTYPE html>
 </html>
 )";
 
-void replace(std::string & value, std::string const & what, std::string const & to)
-{
-    auto const pos = value.find(what);
-    if (pos == std::string::npos) {
-        return;
-    }
-
-    value.replace(pos, what.size(), to);
-}
-
 MHD_Result handle_get(request & req)
 {
     auto const response_type = req.get_query_arg("response_type");

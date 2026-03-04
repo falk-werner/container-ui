@@ -117,7 +117,11 @@ http_response post(
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, unix_socket.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+
+    if (!content_type.empty()) {
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+    }
+
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, &on_read);
     curl_easy_setopt(curl, CURLOPT_READDATA, reinterpret_cast<void*>(&r_context));

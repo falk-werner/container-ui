@@ -33,8 +33,20 @@ export class Api {
         return await this.#fetch_json("api/containers/json?all=true");
     }
 
+    async container_inspect(id) {
+        return await this.#fetch_json(`api/containers/${id}/json?size=true`);
+    }
+
+    async container_stats(id) {
+        return await this.#fetch_json(`api/containers/${id}/stats?one-shot=true&stream=false`);
+    }
+
     async images() {
         return await this.#fetch_json("api/images/json?all=true");
+    }
+
+    async image_inspect(id)  {
+        return await this.#fetch_json(`api/images/${id}/json`);
     }
 
     async volumes() {

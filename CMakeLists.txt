@@ -50,9 +50,7 @@ add_custom_command(
 
 add_library(container-ui-static STATIC
     src/containerui/static_resource_handler.cpp
-    src/containerui/api/passthrough_handler.cpp
-    src/containerui/api/passthrough_with_param_handler.cpp
-    src/containerui/api/create_volume_handler.cpp
+    src/containerui/api/api_handler.cpp
     src/containerui/request.cpp
     src/containerui/webserver.cpp
     src/containerui/webserver_context.cpp
@@ -63,6 +61,7 @@ add_library(container-ui-static STATIC
     src/containerui/util/b64.cpp
     src/containerui/util/token.cpp
     src/containerui/util/sha256.cpp
+    src/containerui/util/path_matcher.cpp
     src/containerui/auth/authorize_handler.cpp
     src/containerui/auth/token_handler.cpp
     src/containerui/auth/authenticator.cpp

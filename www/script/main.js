@@ -50,6 +50,9 @@ async function containers(api) {
 
     for(const container of data) {
         const tr = document.createElement("tr");
+        tr.addEventListener("click", () => {
+            activate_container(api, container.Id);
+        });
         element.appendChild(tr);
 
         const name = document.createElement("td");
@@ -115,6 +118,16 @@ async function volumes(api) {
     }
 }
 
+function activate_page(name) {
+    const pages = document.querySelectorAll(".page");
+    for(const page of pages) {
+        page.classList.add("hidden");
+    }
+
+    const page = document.querySelector(`#${name}`);
+    page.classList.remove("hidden");
+}
+
 function activate_entry(name) {
     const menuentries = document.querySelectorAll(".mainmenu li");
     for(const entry of menuentries) {
@@ -123,13 +136,7 @@ function activate_entry(name) {
     const entry = document.querySelector(`#menuentry_${name}`);
     entry.classList.add("active");
 
-    const pages = document.querySelectorAll(".page");
-    for(const page of pages) {
-        page.classList.add("hidden");
-    }
-
-    const home = document.querySelector(`#${name}`);
-    home.classList.remove("hidden");
+    activate_page(name);
 }
 
 function init_home(api)
@@ -184,6 +191,18 @@ async function activate_containers(api)
 {
     activate_entry("containers");
     containers(api);
+}
+
+async function activate_container(api, id) {
+    activate_page("container");
+    const data = await api.container_inspect(id);
+    const stats = await api.container_stats(id);
+    const image = await api.image_inspect(data.Image.substring(7));
+    
+    set_text("#container_name", data.Name.substring(1));
+    set_text("#container_state", data.State.Status);
+    set_text("#container_image", image.RepoTags[0]);
+
 }
 
 async function activate_images(api)

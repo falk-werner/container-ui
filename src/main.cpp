@@ -4,7 +4,7 @@
 #include "containerui/auth/authorize_handler.hpp"
 #include "containerui/auth/token_handler.hpp"
 #include "containerui/auth/authenticator.hpp"
-#include "containerui/api/api_handlers.hpp"
+#include "containerui/api/api_handler.hpp"
 
 #include <unistd.h>
 
@@ -17,7 +17,7 @@ using container_ui::webserver_context;
 using container_ui::authorize_handler;
 using container_ui::token_handler;
 using container_ui::authenticator;
-using container_ui::create_volume_handler;
+using container_ui::api_handler;
 
 namespace
 {
@@ -49,6 +49,32 @@ void add_oauth_handlers(webserver_context& context, authenticator& auth)
 
 void add_api_handlers(webserver_context& context, authenticator& auth)
 {
+    std::vector<std::string> paths = {
+        // system
+        "version",
+        "info",
+        "system/df",
+
+        // containers
+        "containers/json",
+        "containers/{name}/logs",
+        "containers/{name}/json",
+        "containers/{name}/top",
+        "containers/{name}/stats",
+
+        // images
+        "images/json",
+        "images/{name}/json",
+
+        // volumes
+        "volumes",
+        "volumes/create",
+        "volumes/{name}"
+    };
+
+    context.add(std::make_unique<api_handler>(paths, auth));
+
+/*    
     // sytem
     context.add_passthrough("version", auth);
     context.add_passthrough("info", auth);
@@ -57,12 +83,12 @@ void add_api_handlers(webserver_context& context, authenticator& auth)
     // containers
     context.add_passthrough("containers/json", auth);
     context.add_passthrough_with_param("/api/containers/{name}/logs",
-        "http://localhost/containers/{name}/logs?follow=false&stderr=true&stdout=true&timestamps=true",
+        "http://localhost/containers/{name}/logs",
         auth,
         "text/plain");
     context.add_passthrough_with_param("/api/containers/{name}/json", "http://localhost/containers/{name}/json", auth);
-    context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top?ps_args=-eTopid,ppid,spid,pcpu,pmem,vsz,cmd", auth);
-    context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats?oneshot=true&stream=false", auth);
+    context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top", auth);
+    context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats", auth);
 
     // images
     context.add_passthrough("images/json", auth);
@@ -70,8 +96,9 @@ void add_api_handlers(webserver_context& context, authenticator& auth)
 
     // volumes
     context.add_passthrough("volumes", auth);
-    context.add(std::make_unique<create_volume_handler>(auth));
+    context.add(std::make_unique<post_handler>("volumes/create", auth));
     context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}", auth);
+*/
 }
 
 

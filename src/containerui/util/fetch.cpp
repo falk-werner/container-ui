@@ -119,18 +119,28 @@ http_response post(
 
     std::string content_type = std::string("Content-Type: ") + mimetype;
     curl_slist *list = nullptr;
-    list = curl_slist_append(list, content_type.c_str());
+    if (!content_type.empty()) {
+        list = curl_slist_append(list, content_type.c_str());
+    }
+    if (data.empty()) {
+        list = curl_slist_append(list, "Content-Length: 0");
+    }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, unix_socket.c_str());
 
-    if (!content_type.empty()) {
+    if (list != nullptr) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     }
 
-    curl_easy_setopt(curl, CURLOPT_POST, 1L);
-    curl_easy_setopt(curl, CURLOPT_READFUNCTION, &on_read);
-    curl_easy_setopt(curl, CURLOPT_READDATA, reinterpret_cast<void*>(&r_context));
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+
+    if (!data.empty()) {
+        curl_easy_setopt(curl, CURLOPT_POST, 1L);
+        curl_easy_setopt(curl, CURLOPT_READFUNCTION, &on_read);
+        curl_easy_setopt(curl, CURLOPT_READDATA, reinterpret_cast<void*>(&r_context));
+    }
+
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &on_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(&context));
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);

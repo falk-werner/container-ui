@@ -66,6 +66,10 @@ async function containers(api) {
         const image = document.createElement("td");
         image.textContent = container.Image;
         tr.appendChild(image);
+
+        const rootfs = document.createElement("td");
+        rootfs.textContent = format_mem(container.SizeRootFs);
+        tr.appendChild(rootfs);
     }    
 }
 
@@ -198,6 +202,63 @@ async function activate_home(api)
     document.querySelector("#home_images_total").textContent = df.ImageUsage.TotalCount;
     document.querySelector("#home_volumes_active").textContent = df.VolumeUsage.ActiveCount;
     document.querySelector("#home_volumes_total").textContent = df.VolumeUsage.TotalCount;
+}
+
+function init_containers(api)
+{
+    document.querySelector("#menuentry_containers").addEventListener("click", () => {
+        activate_containers(api);
+    });
+
+    document.querySelector("#container_update").addEventListener("click", () => {
+        const id = document.querySelector("#container_name").textContent;
+        activate_container(api, id);
+    });
+
+    document.querySelector("#container_start").addEventListener("click", async () => {
+        const id = document.querySelector("#container_name").textContent;
+        await api.container_start(id);
+        activate_container(api, id);
+    });
+
+    document.querySelector("#container_stop").addEventListener("click", async () => {
+        const id = document.querySelector("#container_name").textContent;
+        await api.container_stop(id);
+        activate_container(api, id);
+    });
+
+    document.querySelector("#container_pause").addEventListener("click", async () => {
+        const id = document.querySelector("#container_name").textContent;
+        await api.container_pause(id);
+        activate_container(api, id);
+    });
+
+
+    document.querySelector("#container_unpause").addEventListener("click", async () => {
+        const id = document.querySelector("#container_name").textContent;
+        await api.container_unpause(id);
+        activate_container(api, id);
+    });
+
+
+    document.querySelector("#container_restart").addEventListener("click", async () => {
+        const id = document.querySelector("#container_name").textContent;
+        await api.container_restart(id);
+        activate_container(api, id);
+    });
+
+
+    document.querySelector("#container_kill").addEventListener("click", async () => {
+        const id = document.querySelector("#container_name").textContent;
+        await api.container_kill(id);
+        activate_container(api, id);
+    });
+
+    document.querySelector("#container_remove").addEventListener("click", async () => {
+        const id = document.querySelector("#container_name").textContent;
+        await api.container_remove(id);
+        activate_containers(api);
+    });
 }
 
 async function activate_containers(api)
@@ -371,9 +432,8 @@ async function startup() {
 
         const api = new Api(access_token);
         init_home(api);
-        document.querySelector("#menuentry_containers").addEventListener("click", () => {
-            activate_containers(api);
-        });
+        init_containers(api);
+
         document.querySelector("#menuentry_images").addEventListener("click", () => {
             activate_images(api);
         });

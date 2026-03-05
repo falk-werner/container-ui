@@ -17,6 +17,31 @@ export class Api {
         return await response.json();
     }
 
+    async #post(url) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${this.#access_token}`
+            }
+        });
+        if ((response.status < 200) || (300 <= response.status)) {
+            throw new Error();
+        }
+    }
+
+    async #remove(url) {
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${this.#access_token}`
+            }
+        });
+        if ((response.status < 200) || (300 <= response.status)) {
+            throw new Error();
+        }
+    }
+
+
     async version() {
         return await this.#fetch_json("api/version");
     }
@@ -30,7 +55,7 @@ export class Api {
     }
 
     async containers() {
-        return await this.#fetch_json("api/containers/json?all=true");
+        return await this.#fetch_json("api/containers/json?all=true&size=true");
     }
 
     async container_inspect(id) {
@@ -39,6 +64,34 @@ export class Api {
 
     async container_stats(id) {
         return await this.#fetch_json(`api/containers/${id}/stats?one-shot=true&stream=false`);
+    }
+
+    async container_start(id)  {
+        await this.#post(`api/containers/${id}/start`);
+    }
+
+    async container_stop(id)  {
+        await this.#post(`api/containers/${id}/stop`);
+    }
+
+    async container_pause(id)  {
+        await this.#post(`api/containers/${id}/pause`);
+    }
+
+    async container_unpause(id)  {
+        await this.#post(`api/containers/${id}/unpause`);
+    }
+
+    async container_restart(id)  {
+        await this.#post(`api/containers/${id}/restart`);
+    }
+
+    async container_kill(id)  {
+        await this.#post(`api/containers/${id}/kill`);
+    }
+
+    async container_remove(id)  {
+        await this.#remove(`api/containers/${id}`);
     }
 
     async images() {
@@ -58,27 +111,11 @@ export class Api {
     }
 
     async volumes_prune()  {
-        const response = await fetch("api/volumes/prune", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${this.#access_token}`
-            }
-        });
-        if ((response.status < 200) || (300 <= response.status)) {
-            throw new Error();
-        }
+        await this.#post("api/volumes/prune")
     }
 
     async volume_remove(name)  {
-        const response = await fetch(`api/volumes/${name}`, {
-            method: "DELETE",
-            headers: {
-                "Authorization": `Bearer ${this.#access_token}`
-            }
-        });
-        if ((response.status < 200) || (300 <= response.status)) {
-            throw new Error();
-        }
+        await this.#remove(`api/volumes/${name}`);
     }
 
     async volume_create(name) {

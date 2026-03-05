@@ -61,6 +61,13 @@ void add_api_handlers(webserver_context& context, authenticator& auth)
         "containers/{name}/json",
         "containers/{name}/top",
         "containers/{name}/stats",
+        "containers/{name}/start",
+        "containers/{name}/stop",
+        "containers/{name}/pause",
+        "containers/{name}/unpause",
+        "containers/{name}/restart",
+        "containers/{name}/kill",
+        "containers/{name}",
 
         // images
         "images/json",

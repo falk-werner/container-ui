@@ -80,6 +80,7 @@
                             <th>Name</th>
                             <th>Status</th>
                             <th>Image</th>
+                            <th>Root FS</th>
                         </tr>
                     </thead>
                     <tbody id="containers_list"></tbody>
@@ -88,6 +89,16 @@
 
             <div class="page hidden" id="container">
                 <h1>Container <span id="container_name"></span></h1>
+                <div class="commands">
+                    <input id="container_update" type="button" value="Update" />
+                    <input id="container_start" type="button" value="Start" />
+                    <input id="container_pause" type="button" value="Pause" />
+                    <input id="container_unpause" type="button" value="Unpause" />
+                    <input id="container_stop" type="button" value="Stop" />
+                    <input id="container_restart" type="button" value="Restart" />
+                    <input id="container_kill" type="button" value="Kill" />
+                    <input id="container_remove" type="button" value="Remove" />
+                </div>
                 <table class="info_table two_column">
                     <tr><th>State:</th><td id="container_state"></td></tr>
                     <tr><th>Image:</th><td id="container_image"></td></tr>
@@ -132,7 +143,7 @@
             <div class="page hidden" id="volume">
                 <h1>Volume <span id="volume_name"></span></h1>
                 <div class="commands">
-                    <input type="button" id="volume_remove" value="Delete" />
+                    <input type="button" id="volume_remove" value="Remove" />
                 </div>
                 <table class="info_table  two_column">
                     <tr><th>Created At:</th><td id="volume_created_at"></td></tr>

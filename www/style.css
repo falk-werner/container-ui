@@ -98,11 +98,10 @@ table {
     text-align: center;
 }
 
-/*
 #content {
-    flex: 1 0 auto;
+    width: 100%;
+    margin-right: 20px;
 }
-*/
 
 #login form {
     min-width: 300px;
@@ -126,25 +125,12 @@ table {
 /* Home */
 
 #home table {
-    width: 100%;
     margin-top: 20px;
     margin-left: 0px;
     margin-right: 20px;
     margin-bottom: 20px;
     padding-bottom: 5px;
 }
-
-#home tr {
-    background-color: white;
-}
-
-#home td {
-    width: 50%;
-}
-#home table, #home tr, #home td {
-    border: 0 none;
-}
-
 
 #home .content > div {
     display: inline-block;
@@ -170,20 +156,89 @@ table {
 #home .content > div > div {
     text-align: right;
     padding-right: 10px;
+    background-color: white;
 }
 
-/* Container List */
+/* Selectable Table */
 
-#containers th {
+.selectable_table {
+    width: 100%;
+    background-color: white;
+}
+.selectable_table th {
     background-color: black;
     color: white;
 }
 
-#containers_list tr {
+.selectable_table > tbody > tr {
     cursor: pointer;
-    transition: background-color 1s ease;
+    transition: all 1s ease;
 }
 
-#containers_list tr:hover {
+.selectable_table > tbody > tr:hover {
     background-color: #308964;
+}
+
+/* Commands */
+
+.commands {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+/* two_column */
+
+.two_column th, .two_column td{
+    width: 50%;
+}
+
+.four_column th, .four_column td{
+    width: 25%;
+}
+
+
+/* Info Table */
+
+table.info_table {
+    width: 100%;
+}
+
+.info_table tr {
+    background-color: white;
+}
+
+.info_table th {
+    text-align: left;
+}
+
+
+
+table.info_table, .info_table th, .info_table tr, .info_table td {
+    border: 1px solid #c0c0c0;
+}
+
+/* Property Table */
+
+table.property_table {
+    width: 100%;
+}
+
+.property_table > thead > tr {
+    background-color: black;
+    color: white;
+}
+
+.property_table > tbody > tr {
+    cursor: pointer;
+    background-color: white;
+    transition: all 1s ease;
+}
+
+.property_table > tbody > tr:hover {
+    background-color: #e0e0e0;
+}
+
+
+table.property_table, .property_table th, .property_table tr, .property_table td {
+    border: 1px solid black;
 }

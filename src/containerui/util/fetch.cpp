@@ -67,7 +67,8 @@ size_t on_data(char * ptr, size_t size, size_t n, void * userdata)
 
 http_response fetch(
     std::string const & url,
-    std::string const & unix_socket)
+    std::string const & unix_socket,
+    std::string const & method)
 {
     write_context context;
     context.limit = 1 * 1024 * 1024;
@@ -76,6 +77,11 @@ http_response fetch(
     auto * curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_UNIX_SOCKET_PATH, unix_socket.c_str());
+
+    if (!method.empty()) {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.c_str());
+    }
+
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &on_data);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(&context));
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);

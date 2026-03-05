@@ -53,7 +53,35 @@ export class Api {
         return await this.#fetch_json("api/volumes");
     }
 
-    async create_volume(name) {
+    async volume_inspect(name)  {
+        return await this.#fetch_json(`api/volumes/${name}`);
+    }
+
+    async volumes_prune()  {
+        const response = await fetch("api/volumes/prune", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${this.#access_token}`
+            }
+        });
+        if ((response.status < 200) || (300 <= response.status)) {
+            throw new Error();
+        }
+    }
+
+    async volume_remove(name)  {
+        const response = await fetch(`api/volumes/${name}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${this.#access_token}`
+            }
+        });
+        if ((response.status < 200) || (300 <= response.status)) {
+            throw new Error();
+        }
+    }
+
+    async volume_create(name) {
         const response = await fetch("api/volumes/create", {
             method: "POST",
             headers: {

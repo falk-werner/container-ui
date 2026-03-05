@@ -69,36 +69,11 @@ void add_api_handlers(webserver_context& context, authenticator& auth)
         // volumes
         "volumes",
         "volumes/create",
+        "volumes/prune",
         "volumes/{name}"
     };
 
     context.add(std::make_unique<api_handler>(paths, auth));
-
-/*    
-    // sytem
-    context.add_passthrough("version", auth);
-    context.add_passthrough("info", auth);
-    context.add_passthrough("system/df", auth);
-
-    // containers
-    context.add_passthrough("containers/json", auth);
-    context.add_passthrough_with_param("/api/containers/{name}/logs",
-        "http://localhost/containers/{name}/logs",
-        auth,
-        "text/plain");
-    context.add_passthrough_with_param("/api/containers/{name}/json", "http://localhost/containers/{name}/json", auth);
-    context.add_passthrough_with_param("/api/containers/{name}/top", "http://localhost/containers/{name}/top", auth);
-    context.add_passthrough_with_param("/api/containers/{name}/stats", "http://localhost/containers/{name}/stats", auth);
-
-    // images
-    context.add_passthrough("images/json", auth);
-    context.add_passthrough_with_param("/api/images/{name}/json", "http://localhost/images/{name}/json", auth);
-
-    // volumes
-    context.add_passthrough("volumes", auth);
-    context.add(std::make_unique<post_handler>("volumes/create", auth));
-    context.add_passthrough_with_param("/api/volumes/{name}", "http://localhost/volumes/{name}", auth);
-*/
 }
 
 

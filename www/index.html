@@ -40,48 +40,33 @@
 
             <div class="page hidden" id="home">
                 <h1>Home</h1>
-                <table>
-                    <tr>
-                        <td>Name</td>
-                        <td id="home_name"></td>
-                    </tr>
-                    <tr>
-                        <td>Engine / Version</td>
-                        <td id="home_engine_version"></td>
-                    </tr>
-                    <tr>
-                        <td>Architecture</td>
-                        <td id="home_arch"></td>
-                    </tr>
-                    <tr>
-                        <td>CPUs</td>
-                        <td id="home_ncpu"></td>
-                    </tr>
-                    <tr>
-                        <td>Memory</td>
-                        <td id="home_memory"></td>
-                    </tr>
+                <table class="info_table  two_column">
+                    <tr><th>Name:</th><td id="home_name"></td></tr>
+                    <tr><th>Engine / Version:</th><td id="home_engine_version"></td></tr>
+                    <tr><th>Architecture</th><td id="home_arch"></td></tr>
+                    <tr><th>CPUs</th><td id="home_ncpu"></td></tr>
+                    <tr><th>Memory</th><td id="home_memory"></td></tr>
                 </table>
                 <div class="content">
                     <div id="home_containers">
                         <h2>Containers</h2>
                         <div>
-                            Running:<span id="home_containers_running"></span>
-                            Total:<span id="home_containers_total"></span>
+                            Running: <span id="home_containers_running"></span>
+                            Total: <span id="home_containers_total"></span>
                         </div>
                     </div>
                     <div id="home_images">
                         <h2>Images</h2>
                         <div>
-                            Active:<span id="home_images_active"></span>
-                            Total:<span id="home_images_total"></span>
+                            Active: <span id="home_images_active"></span>
+                            Total: <span id="home_images_total"></span>
                         </div>
                     </div>
                     <div id="home_volumes">
                         <h2>Volumes</h2>
                         <div>
-                            Active:<span id="home_volumes_active"></span>
-                            Total:<span id="home_volumes_total"></span>
+                            Active: <span id="home_volumes_active"></span>
+                            Total: <span id="home_volumes_total"></span>
                         </div>
                     </div>
                 </div>
@@ -89,7 +74,7 @@
 
             <div class="page hidden" id="containers">
                 <h1>Containers</h1>
-                <table>
+                <table class="selectable_table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -103,15 +88,15 @@
 
             <div class="page hidden" id="container">
                 <h1>Container <span id="container_name"></span></h1>
-                <table>
-                    <tr><td>State</td><td id="container_state"></td></tr>
-                    <tr><td>Image</td><td id="container_image"></td></tr>
+                <table class="info_table two_column">
+                    <tr><th>State:</th><td id="container_state"></td></tr>
+                    <tr><th>Image:</th><td id="container_image"></td></tr>
                 </table>
             </div>
 
             <div class="page hidden" id="images">
                 <h1>Images</h1>
-                <table>
+                <table class="selectable_table">
                     <thead>
                         <tr>
                             <th>Tags</th>
@@ -125,45 +110,83 @@
 
             <div class="page hidden" id="volumes">
                 <h1>Volumes</h1>
-                <div>
+                <div class="commands">
                     <label>Name:</label>
                     <input type="text" id="volumes_new_name"/>
                     <input type="button" id="volumes_new" value="Create New Volume"/>
+                    <input type="button" id="volumes_prune" value="Prune" />
                 </div>
-                <table>
+                <table class="selectable_table">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Created</th>
+                            <th>Reference Count</th>
+                            <th>Size</th>
                         </tr>
                     </thead>
                     <tbody id="volumes_list"></tbody>
                 </table>
             </div>
 
+            <div class="page hidden" id="volume">
+                <h1>Volume <span id="volume_name"></span></h1>
+                <div class="commands">
+                    <input type="button" id="volume_remove" value="Delete" />
+                </div>
+                <table class="info_table  two_column">
+                    <tr><th>Created At:</th><td id="volume_created_at"></td></tr>
+                    <tr><th>Reference Count:</th><td id="volume_ref_count"></td></tr>
+                    <tr><th>Size:</th><td id="volume_size"></td></tr>
+                    <tr><th>Driver:</th><td id="volume_driver"></td></tr>
+                    <tr><th>Scope:</th><td id="volume_scope"></td></tr>
+                    <tr><th>Mountpoint:</th><td id="volume_mountpoint"></td></tr>
+                </table>
+                <h2>Labels</h2>
+                <table class="property_table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="volume_labels"></tbody>
+                </table>
+                <h2>Options</h2>
+                <table class="property_table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="volume_options"></tbody>
+                </table>
+            </div>
+
             <div class="page" id="system">
                 <h1>System</h1>
-                <table>
-                    <tr><th>Operating System</th><td id="system_os"></td></tr>
-                    <tr><th>Architecture</th><td id="system_arch"></td></tr>
-                    <tr><th>CPUs</th><td id="system_ncpu"></td></tr>
-                    <tr><th>Memory</th><td id="system_memory"></td></tr>
+                <table class="info_table  two_column">
+                    <tr><th>Operating System:</th><td id="system_os"></td></tr>
+                    <tr><th>Architecture:</th><td id="system_arch"></td></tr>
+                    <tr><th>CPUs:</th><td id="system_ncpu"></td></tr>
+                    <tr><th>Memory:</th><td id="system_memory"></td></tr>
                 </table>
 
 
                 <h1>Engine</h1>
-                <table>
-                    <tr><th>Name</th><td id="engine_name"></td></tr>
-                    <tr><th>Version</th><td id="engine_version"></td></tr>
+                <table class="info_table two_column">
+                    <tr><th>Name:</th><td id="engine_name"></td></tr>
+                    <tr><th>Version:</th><td id="engine_version"></td></tr>
                 </table>  
 
                 <h1>Disk Usage</h1>
-                <table>
-                    <tr><th>Category</th><th>Count</th><th>Total Size</th><th>Reclaimable Size</th></tr>
-                    <tr><th>Containers</th><td id="df_container_count"></td><td id="df_container_total"></td><td id="df_container_reclaimable"></td></tr>
-                    <tr><th>Images</th><td id="df_image_count"></td><td id="df_image_total"></td><td id="df_image_reclaimable"></td></tr>
-                    <tr><th>Volumes</th><td id="df_volume_count"></td><td id="df_volume_total"></td><td id="df_volume_reclaimable"></td></tr>
-                    <tr><th>Build Cache</th><td id="df_bcache_count"></td><td id="df_bcache_total"></td><td id="df_bcache_reclaimable"></td></tr>
+                <table class="info_table four_column">
+                    <tr><th>Category:</th><th>Count</th><th>Total Size</th><th>Reclaimable Size</th></tr>
+                    <tr><th>Containers:</th><td id="df_container_count"></td><td id="df_container_total"></td><td id="df_container_reclaimable"></td></tr>
+                    <tr><th>Images:</th><td id="df_image_count"></td><td id="df_image_total"></td><td id="df_image_reclaimable"></td></tr>
+                    <tr><th>Volumes:</th><td id="df_volume_count"></td><td id="df_volume_total"></td><td id="df_volume_reclaimable"></td></tr>
+                    <tr><th>Build Cache:</th><td id="df_bcache_count"></td><td id="df_bcache_total"></td><td id="df_bcache_reclaimable"></td></tr>
                 </table>
             </div>
             

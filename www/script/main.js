@@ -101,11 +101,14 @@ async function images(api) {
 
 async function volumes(api) {
     const data = await api.volumes();
+    const df = await api.disk_usage();
+
     const element = document.querySelector("#volumes_list");
     element.innerHTML = "";
 
     for(const volume of data.Volumes) {
         const tr = document.createElement("tr");
+        tr.addEventListener("click", () => { activate_volume(api, volume.Name); });
         element.appendChild(tr);
 
         const name = document.createElement("td");
@@ -115,6 +118,16 @@ async function volumes(api) {
         const created = document.createElement("td");
         created.textContent = volume.CreatedAt;
         tr.appendChild(created);
+
+        const info = get_volume_info(df, volume.Name);
+
+        const ref_count = document.createElement("td");
+        ref_count.textContent = (info) ? info.UsageData.RefCount : "unknown";
+        tr.appendChild(ref_count);
+
+        const volume_size = document.createElement("td");
+        volume_size.textContent = (info) ? format_mem(info.UsageData.Size) : "unknown";
+        tr.appendChild(volume_size);
     }
 }
 
@@ -211,11 +224,131 @@ async function activate_images(api)
     images(api);
 }
 
+function init_volumes(api)
+{
+    document.querySelector("#menuentry_volumes").addEventListener("click", () => {
+        activate_volumes(api);
+    });
+
+    document.querySelector("#volumes_new").addEventListener('click', async () => {
+        try {
+            const name = document.querySelector("#volumes_new_name");
+            await api.volume_create(name.value);
+            activate_volumes(api);
+        }
+        catch (ex) {
+            console.log(ex);
+        }
+    });
+
+    document.querySelector("#volumes_prune").addEventListener('click', async () => {
+        try {
+            await api.volumes_prune();
+            activate_volumes(api);
+        }
+        catch (ex) {
+            console.log(ex);
+        }
+    });
+
+    document.querySelector("#volume_remove").addEventListener('click', async () => {
+        try {
+            const name = document.querySelector("#volume_name").textContent;
+            await api.volume_remove(name);
+            activate_volumes(api);
+        }
+        catch (ex) {
+            console.log(ex);
+        }
+    });
+}
+
 async function activate_volumes(api)
 {
     activate_entry("volumes");
     volumes(api);
 }
+
+function get_volume_info(df, name) {
+    for(const volume of df.Volumes) {
+        if (volume.Name == name) {
+            return volume;
+        }
+    }
+
+    return null;
+    // throw new Error("volume not found");
+}
+
+async function activate_volume(api, name) {
+    activate_page("volume");
+    const volume = await api.volume_inspect(name);
+    const df = await api.disk_usage();
+    const info = get_volume_info(df, name);
+
+    set_text("#volume_name", volume.Name);
+    set_text("#volume_created_at", volume.CreatedAt);
+    set_text("#volume_ref_count", (info) ? info.UsageData.RefCount : "unknown");
+    set_text("#volume_size", (info) ? format_mem(info.UsageData.Size) : "unknown");
+    set_text("#volume_driver", volume.Driver);
+    set_text("#volume_scope", volume.Scope);
+    set_text("#volume_mountpoint", volume.Mountpoint);
+
+    const labels_element = document.querySelector("#volume_labels");
+    labels_element.innerHTML = "";
+    if ((volume.Labels) && (Object.keys(volume.Labels).length > 0)) {
+
+        for(const [name, value] of Object.entries(volume.Labels)) {
+            const tr = document.createElement("tr");
+            labels_element.appendChild(tr);
+
+            const td_name = document.createElement("td");
+            td_name.textContent = name;
+            tr.appendChild(td_name);
+
+            const td_value = document.createElement("td");
+            td_value.textContent = value;
+            tr.appendChild(td_value);
+        }
+    }
+    else {
+        const tr = document.createElement("tr");
+        labels_element.appendChild(tr);
+
+        const td = document.createElement("td");
+        td.setAttribute("colspan", "2");
+        td.textContent = "No Labels set";
+        tr.appendChild(td);
+    }
+
+    const opts_element = document.querySelector("#volume_options");
+    opts_element.innerHTML = "";
+    if ((volume.Options) && (Object.keys(volume.Options).length > 0)) {
+
+        for(const [name, value] of Object.entries(volume.Options)) {
+            const tr = document.createElement("tr");
+            opts_element.appendChild(tr);
+
+            const td_name = document.createElement("td");
+            td_name.textContent = name;
+            tr.appendChild(td_name);
+
+            const td_value = document.createElement("td");
+            td_value.textContent = value;
+            tr.appendChild(td_value);
+        }
+    }
+    else {
+        const tr = document.createElement("tr");
+        opts_element.appendChild(tr);
+
+        const td = document.createElement("td");
+        td.setAttribute("colspan", "2");
+        td.textContent = "No Options present";
+        tr.appendChild(td);
+    }
+}
+
 
 async function activate_system(api)
 {
@@ -245,19 +378,7 @@ async function startup() {
             activate_images(api);
         });
 
-        document.querySelector("#menuentry_volumes").addEventListener("click", () => {
-            activate_volumes(api);
-        });
-        document.querySelector("#volumes_new").addEventListener('click', async () => {
-            try {
-                const name = document.querySelector("#volumes_new_name");
-                await api.create_volume(name.value);
-                activate_volumes(api);
-            }
-            catch (ex) {
-                console.log(ex);
-            }
-        });
+        init_volumes(api);
 
         document.querySelector("#menuentry_system").addEventListener("click", () => {
             activate_system(api);

@@ -54,6 +54,23 @@ MHD_Result handle_post(request & req)
     return req.respond(resp.status, resp.contents, "text/plain");
 }
 
+MHD_Result handle_delete(request & req)
+{
+    std::string const path = req.url.substr(5);
+
+    std::stringstream url;
+    url << "http://localhost/" << path ;
+    char sep = '?';
+    for(auto const & entry: req.get_all_query_args()) {
+        url << sep << url_encode(entry.key) << '=' << url_encode(entry.value);
+        sep = '&';
+    }
+
+    auto const resp = fetch(url.str(), "/var/run/docker.sock", "DELETE");
+    return req.respond_empty(resp.status);
+}
+
+
 }
 
 api_handler::api_handler(std::vector<std::string> const & paths, authenticator & auth)
@@ -80,6 +97,11 @@ bool api_handler::handle(request & req, MHD_Result & result)
 
     if (req.method == "POST") {
         result = handle_post(req);
+        return true;
+    }
+
+    if (req.method == "DELETE") {
+        result = handle_delete(req);
         return true;
     }
 

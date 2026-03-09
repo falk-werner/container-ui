@@ -276,9 +276,112 @@ async function activate_container(api, id) {
     set_text("#container_name", data.Name.substring(1));
     set_text("#container_created_at", data.Created);
     set_text("#container_state", data.State.Status);
+    set_text("#container_command", `${data.Path} ${data.Args.join(" ")}`);
+    set_text("#container_rootfs_size", format_mem(data.SizeRootFs));
+    set_text("#container_rw_size", format_mem(data.SizeRw));
     set_text("#container_image", image.RepoTags[0]);
     set_text("#container_hostname", data.Config.Hostname);
     set_text("#container_network_mode", data.HostConfig.NetworkMode);
+
+    // Mounts
+
+    const mounts = document.querySelector("#container_mounts");
+    mounts.innerHTML = "";
+
+    for(const mount of data.Mounts) {
+        const tr = document.createElement("tr");
+        mounts.appendChild(tr);
+
+        const type = document.createElement("td");
+        type.textContent = mount.Type;
+        tr.appendChild(type);
+
+        const source = document.createElement("td");
+        source.textContent = (mount.Type == "volume") ? mount.Name : mount.Source;
+        tr.appendChild(source);
+
+        const dest = document.createElement("td");
+        dest.textContent = mount.Destination;
+        tr.appendChild(dest);
+
+        const mode = document.createElement("td");
+        mode.textContent = (mount.RW) ? "r/w" : "ro";
+        tr.appendChild(mode);
+    }
+
+    if (data.Mounts.length == 0) {
+        const tr = document.createElement("tr");
+        mounts.appendChild(tr);
+
+        const td = document.createElement("td");
+        td.setAttribute("colspan", "4");
+        td.textContent = "no mounts present";
+        tr.appendChild(td);
+    }
+
+    // Ports
+
+    const ports = document.querySelector("#container_ports");
+    ports.innerHTML = "";
+
+    for(const [port, port_data] of Object.entries(data.NetworkSettings.Ports)) {
+        const tr = document.createElement("tr");
+        ports.appendChild(tr);
+
+        const name = document.createElement("td");
+        name.textContent = port;
+        tr.appendChild(name);
+
+        const host = document.createElement("td");
+        let host_str = "";
+        for(const entry of port_data) {
+            if (host_str != "") {
+                host_str += ", "
+            }
+            if (entry.HostIp.includes(":")) {
+                host_str += `[${entry.HostIp}]:${entry.HostPort}`;
+            }
+            else {
+                host_str += `${entry.HostIp}:${entry.HostPort}`;
+            }
+        }
+        host.textContent = host_str;
+        tr.appendChild(host);
+    }
+
+    if (Object.keys(data.NetworkSettings.Ports).length == 0) {
+        const tr = document.createElement("tr");
+        ports.appendChild(tr);
+
+        const td = document.createElement("td");
+        td.setAttribute("colspan", "2");
+        td.textContent = "no ports mappend";
+        tr.appendChild(td);
+    }
+
+    // Environment
+
+    const env = document.querySelector("#container_env");
+    env.innerHTML = "";
+
+    for(const value of data.Config.Env) {
+        const tr = document.createElement("tr");
+        env.appendChild(tr);
+
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+    }
+
+    if (data.Config.Env.length == 0) {
+        const tr = document.createElement("tr");
+        env.appendChild(env);
+
+        const td = document.createElement("td");
+        td.setAttribute("colspan", "2");
+        td.textContent = "no environment set";
+        tr.appendChild(td);
+    }
 
 }
 

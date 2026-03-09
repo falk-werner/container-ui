@@ -103,8 +103,42 @@
                     <tr><th>Created At:</th><td id="container_created_at"></td></tr>
                     <tr><th>State:</th><td id="container_state"></td></tr>
                     <tr><th>Image:</th><td id="container_image"></td></tr>
+                    <tr><th>Command:</th><td id="container_command"></td></tr>
+                    <tr><th>RootFS Size:</th><td id="container_rootfs_size"></td></tr>
+                    <tr><th>R/W Size:</th><td id="container_rw_size"></td></tr>
                     <tr><th>Hostname:</th><td id="container_hostname"></td></tr>
                     <tr><th>Network Mode:</th><td id="container_network_mode"></td></tr>
+                </table>
+                <h2>Mounts</h2>
+                <table class="property_table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Host</th>
+                            <th>Container</th>
+                            <th>Mode</th>
+                        </tr>
+                    </thead>
+                    <tbody id="container_mounts"></tbody>
+                </table>
+                <h2>Ports</h2>
+                <table class="property_table">    
+                    <thead>
+                        <tr>
+                            <th>Port</th>
+                            <th>Host</th>
+                        </tr>
+                    </thead>
+                    <tbody id="container_ports"></tbody>
+                </table>
+                <h2>Environment</h2>
+                <table class="property_table">
+                    <thead>
+                        <tr>
+                            <th>Environment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="container_env"></tbody>
                 </table>
             </div>
 

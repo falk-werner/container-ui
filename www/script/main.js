@@ -274,8 +274,11 @@ async function activate_container(api, id) {
     const image = await api.image_inspect(data.Image.substring(7));
     
     set_text("#container_name", data.Name.substring(1));
+    set_text("#container_created_at", data.Created);
     set_text("#container_state", data.State.Status);
     set_text("#container_image", image.RepoTags[0]);
+    set_text("#container_hostname", data.Config.Hostname);
+    set_text("#container_network_mode", data.HostConfig.NetworkMode);
 
 }
 

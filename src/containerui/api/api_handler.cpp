@@ -11,7 +11,7 @@ namespace container_ui
 namespace
 {
 
-MHD_Result handle_get(request & req)
+std::string get_url(request & req)
 {
     std::string const path = req.url.substr(5);
 
@@ -23,7 +23,13 @@ MHD_Result handle_get(request & req)
         sep = '&';
     }
 
-    auto const resp = fetch(url.str(), "/var/run/docker.sock");
+    return url.str();
+}
+
+MHD_Result handle_get(request & req)
+{
+    auto const url = get_url(req);
+    auto const resp = fetch(url, "/var/run/docker.sock");
     return req.respond(resp.status, resp.contents, "application/json");
 }
 
@@ -35,18 +41,10 @@ MHD_Result handle_post(request & req)
         return result;
     }
 
-    std::string const path = req.url.substr(5);
-    std::stringstream url;
-    url << "http://localhost/" << path;
-    char sep = '?';
-    for(auto const & entry: req.get_all_query_args()) {
-        url << sep << url_encode(entry.key) << '=' << url_encode(entry.value);
-        sep = '&';
-    }
-
+    auto const url = get_url(req);
     auto const content_type = req.get_header("Content-Type");
 
-    auto const resp = post(url.str(), "/var/run/docker.sock", data, content_type);
+    auto const resp = post(url, "/var/run/docker.sock", data, content_type);
     if (resp.contents.empty()) {
         return req.respond_empty(resp.status);
     }
@@ -56,24 +54,15 @@ MHD_Result handle_post(request & req)
 
 MHD_Result handle_delete(request & req)
 {
-    std::string const path = req.url.substr(5);
-
-    std::stringstream url;
-    url << "http://localhost/" << path ;
-    char sep = '?';
-    for(auto const & entry: req.get_all_query_args()) {
-        url << sep << url_encode(entry.key) << '=' << url_encode(entry.value);
-        sep = '&';
-    }
-
-    auto const resp = fetch(url.str(), "/var/run/docker.sock", "DELETE");
+    auto const url = get_url(req);
+    auto const resp = fetch(url, "/var/run/docker.sock", "DELETE");
     return req.respond_empty(resp.status);
 }
 
 
 }
 
-api_handler::api_handler(std::vector<std::string> const & paths, authenticator & auth)
+api_handler::api_handler(std::vector<path_info> const & paths, authenticator & auth)
 : matcher("/api/", paths)
 , _auth(auth)
 {
@@ -82,7 +71,7 @@ api_handler::api_handler(std::vector<std::string> const & paths, authenticator &
 
 bool api_handler::handle(request & req, MHD_Result & result)
 {
-    if (!matcher.matches(req.url)) { return false; }
+    if (!matcher.matches(req)) { return false; }
 
     auto const token = req.get_bearer_token();
     if (!_auth.is_token_valid(token)) {

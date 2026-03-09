@@ -5,6 +5,7 @@
 #include "containerui/auth/token_handler.hpp"
 #include "containerui/auth/authenticator.hpp"
 #include "containerui/api/api_handler.hpp"
+#include "containerui/api/api_handler.hpp"
 
 #include <unistd.h>
 
@@ -18,6 +19,9 @@ using container_ui::authorize_handler;
 using container_ui::token_handler;
 using container_ui::authenticator;
 using container_ui::api_handler;
+using container_ui::matcher_type;
+using container_ui::matcher_verb;
+using container_ui::path_info;
 
 namespace
 {
@@ -49,36 +53,36 @@ void add_oauth_handlers(webserver_context& context, authenticator& auth)
 
 void add_api_handlers(webserver_context& context, authenticator& auth)
 {
-    std::vector<std::string> paths = {
+    std::vector<path_info> paths = {
         // system
-        "version",
-        "info",
-        "system/df",
+        {matcher_type::simple, "version", "", matcher_verb::get},
+        {matcher_type::simple, "info", "", matcher_verb::get},
+        {matcher_type::simple, "system/df", "", matcher_verb::get},
 
         // containers
-        "containers/json",
-        "containers/{name}/logs",
-        "containers/{name}/json",
-        "containers/{name}/top",
-        "containers/{name}/stats",
-        "containers/{name}/start",
-        "containers/{name}/stop",
-        "containers/{name}/pause",
-        "containers/{name}/unpause",
-        "containers/{name}/restart",
-        "containers/{name}/kill",
-        "containers/{name}",
+        {matcher_type::simple, "containers/json", "", matcher_verb::get},
+        {matcher_type::parameter, "containers/", "/logs", matcher_verb::get},
+        {matcher_type::parameter, "containers/", "/json", matcher_verb::get},
+        {matcher_type::parameter, "containers/", "/top", matcher_verb::get},
+        {matcher_type::parameter, "containers/", "/stats", matcher_verb::get},
+        {matcher_type::parameter, "containers/", "/start", matcher_verb::post},
+        {matcher_type::parameter, "containers/", "/stop", matcher_verb::post},
+        {matcher_type::parameter, "containers/", "/pause",matcher_verb::post},
+        {matcher_type::parameter, "containers/", "/unpause",matcher_verb::post},
+        {matcher_type::parameter, "containers/", "/restart",matcher_verb::post},
+        {matcher_type::parameter, "containers/", "/kill",matcher_verb::post},
+        {matcher_type::parameter, "containers/", "",matcher_verb::del},
 
         // images
-        "images/json",
-        "images/{name}/json",
-        "images/{name}",
+        {matcher_type::simple, "images/json", "", matcher_verb::get},
+        {matcher_type::parameter, "images/", "/json", matcher_verb::get},
+        {matcher_type::parameter, "images/", "", matcher_verb::del},
 
         // volumes
-        "volumes",
-        "volumes/create",
-        "volumes/prune",
-        "volumes/{name}"
+        {matcher_type::simple, "volumes", "", matcher_verb::get},
+        {matcher_type::simple, "volumes/create", "", matcher_verb::post},
+        {matcher_type::simple, "volumes/prune", "", matcher_verb::post},
+        {matcher_type::parameter, "volumes/", "", matcher_verb::get_del}
     };
 
     context.add(std::make_unique<api_handler>(paths, auth));

@@ -15,38 +15,45 @@ bool is_valid(char c) {
     );
 }
 
+matcher_verb get_verb(request const & req) {
+    if (req.method == "GET") {
+        return matcher_verb::get;
+    }
+    if (req.method == "POST") {
+        return matcher_verb::post;
+    }
+    if (req.method == "DELETE") {
+        return matcher_verb::del;
+    }
+    return matcher_verb::none;
 }
 
-path_matcher::path_matcher(std::string const & context, std::vector<std::string> const & paths)
+}
+
+path_matcher::path_matcher(std::string const & context, std::vector<path_info> const & paths)
+: path_infos(paths)
 {
-    for(auto const & path: paths) {
-        path_info info;
-
-        auto const pos = path.find("{name}");
-        if (pos == std::string::npos) {
-            info.type = matcher_type::simple;
-            info.path_or_prefix = context + path;
-            info.suffix = "";            
-        }
-        else {            
-            info.type = matcher_type::parameter;
-            info.path_or_prefix = context + path.substr(0, pos);
-            info.suffix = path.substr(pos + 6);
-        }
-
-        path_infos.emplace_back(info);
+    for(auto & info: path_infos) {
+        info.path_or_prefix = context + info.path_or_prefix;
     }
 }
 
-bool path_matcher::matches(std::string const & path) const
+bool path_matcher::matches(request const & req) const
 {
+    auto const & path = req.url;
+    auto const verb = static_cast<int>(get_verb(req));
+
     for(auto const & info: path_infos) {
+        if ((static_cast<int>(info.verb) & verb) == 0) {
+            continue;
+        }
+
         if (info.type == matcher_type::simple) {
             if (path == info.path_or_prefix) {
                 return true;
             }
         }
-        else {
+        else { 
             if (!path.starts_with(info.path_or_prefix)) {
                 continue;
             }

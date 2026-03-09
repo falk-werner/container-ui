@@ -72,6 +72,7 @@ void add_api_handlers(webserver_context& context, authenticator& auth)
         // images
         "images/json",
         "images/{name}/json",
+        "images/{name}",
 
         // volumes
         "volumes",

@@ -76,9 +76,13 @@ async function containers(api) {
 async function images(api) {
     const data = await api.images();
     const element = document.querySelector("#images_list");
+    element.innerHTML = "";
 
     for(const image of data) {
         const tr = document.createElement("tr");
+        tr.addEventListener("click", () => {
+            activate_image(api, image.Id.substring(7));
+        });
         element.appendChild(tr);
 
         const tags_id = document.createElement("td");
@@ -385,11 +389,36 @@ async function activate_container(api, id) {
 
 }
 
+function init_images(api)
+{
+    document.querySelector("#menuentry_images").addEventListener("click", () => {
+        activate_images(api);
+    });
+
+    document.querySelector("#image_remove").addEventListener("click", async () => {
+        const id = document.querySelector("#image_id").textContent;
+        await api.image_remove(id);
+        activate_images(api);
+    });
+}
+
 async function activate_images(api)
 {
     activate_entry("images");
     images(api);
 }
+
+async function activate_image(api, id)
+{
+    activate_page("image");
+    const data = await api.image_inspect(id);
+
+    set_text("#image_name", data.RepoTags[0]);
+    set_text("#image_created_at", data.Created);
+    set_text("#image_id", id);
+    set_text("#image_size", format_mem(data.Size));
+}
+
 
 function init_volumes(api)
 {
@@ -444,7 +473,6 @@ function get_volume_info(df, name) {
     }
 
     return null;
-    // throw new Error("volume not found");
 }
 
 async function activate_volume(api, name) {
@@ -539,11 +567,7 @@ async function startup() {
         const api = new Api(access_token);
         init_home(api);
         init_containers(api);
-
-        document.querySelector("#menuentry_images").addEventListener("click", () => {
-            activate_images(api);
-        });
-
+        init_images(api);
         init_volumes(api);
 
         document.querySelector("#menuentry_system").addEventListener("click", () => {

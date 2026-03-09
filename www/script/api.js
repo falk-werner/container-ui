@@ -102,6 +102,10 @@ export class Api {
         return await this.#fetch_json(`api/images/${id}/json`);
     }
 
+    async image_remove(id) {
+        await this.#remove(`api/images/${id}`);
+    }
+
     async volumes() {
         return await this.#fetch_json("api/volumes");
     }

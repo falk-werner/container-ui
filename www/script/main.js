@@ -26,19 +26,19 @@ async function disk_usage(api) {
     const data = await api.disk_usage();
 
     set_text("#df_container_count", data.ContainerUsage.TotalCount);
-    set_text("#df_container_total", format_mem(data.ContainerUsage.TotalSize));
+    set_text("#df_container_total", format_mem(data.ContainerUsage.TotalSize || 0));
     set_text("#df_container_reclaimable", format_mem(data.ContainerUsage.Reclaimable || 0));
 
     set_text("#df_image_count", data.ImageUsage.TotalCount);
-    set_text("#df_image_total", format_mem(data.ImageUsage.TotalSize));
+    set_text("#df_image_total", format_mem(data.ImageUsage.TotalSize || 0));
     set_text("#df_image_reclaimable", format_mem(data.ImageUsage.Reclaimable || 0));
 
     set_text("#df_volume_count", data.VolumeUsage.TotalCount);
-    set_text("#df_volume_total", format_mem(data.VolumeUsage.TotalSize));
+    set_text("#df_volume_total", format_mem(data.VolumeUsage.TotalSize || 0));
     set_text("#df_volume_reclaimable", format_mem(data.VolumeUsage.Reclaimable || 0));
 
     set_text("#df_bcache_count", data.BuildCacheUsage.TotalCount);
-    set_text("#df_bcache_total", format_mem(data.BuildCacheUsage.TotalSize));
+    set_text("#df_bcache_total", format_mem(data.BuildCacheUsage.TotalSize || 0));
     set_text("#df_bcache_reclaimable", format_mem(data.BuildCacheUsage.Reclaimable || 0));
 }
 
